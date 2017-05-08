@@ -12,11 +12,13 @@ class BioGearsDemoMainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit BioGearsDemoMainWindow(QWidget *parent = 0);
+  BioGearsDemoMainWindow();
   ~BioGearsDemoMainWindow();
 
 private:
-  Ui::BioGearsDemoMainWindow *ui;
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif // BIOGEARSDEMOMAINWINDOW_H
