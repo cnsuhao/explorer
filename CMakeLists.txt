@@ -45,6 +45,8 @@ endif()
 
 set(moc_sources
   ${project_name}MainWindow.h
+  FileLoader.h
+  Scenario.h
 )
 
 #------------------------------------------------------------------------------
@@ -69,12 +71,35 @@ SOURCE_GROUP("Generated" FILES
 SET(${project_name}_SOURCE_FILES
   ${project_name}MainWindow.cxx
   ${project_name}MainWindow.h
+  FileLoader.cxx
+  FileLoader.h
+  Scenario.cxx
+  Scenario.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR})
+  ${CMAKE_CURRENT_BINARY_DIR}
+  "${CMAKE_BINARY_DIR}/../BioGears-build/install/include/"
+  "${CMAKE_BINARY_DIR}/../BioGears-build/install/include/cdm"
+  )
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" lower_build_type)
+
+LINK_DIRECTORIES(
+  "${CMAKE_CURRENT_BINARY_DIR}/../BioGears-build/install/lib/${lower_build_type}"
+  )
+
+SET(BIOGEARS_LIB_DIR "${CMAKE_INSTALL_PREFIX}/bin/${lower_build_type}")
+
+if (WIN32)
+  SET(LIB_ENDING "dll")
+elseif (APPLE)
+  SET(LIB_ENDING "dylib")
+else()
+  SET(LIB_ENDING "so")
+endif()
 
 build_paraview_client(${project_name}
   TITLE "BioGears Demo"
@@ -85,7 +110,7 @@ build_paraview_client(${project_name}
 #  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"
   PVMAIN_WINDOW ${project_name}MainWindow
   PVMAIN_WINDOW_INCLUDE ${project_name}MainWindow.h
-  EXTRA_DEPENDENCIES vtkPVServerManagerRendering
+  EXTRA_DEPENDENCIES vtkPVServerManagerRendering log4cpp ${BIOGEARS_LIB_DIR}/BioGearsEngine.${LIB_ENDING} ${BIOGEARS_LIB_DIR}/CommonDataModel.${LIB_ENDING} ${BIOGEARS_LIB_DIR}/CommonDataModelJNI.${LIB_ENDING} ${BIOGEARS_LIB_DIR}/DataModelBindings.${LIB_ENDING}
   SOURCES ${${project_name}_SOURCE_FILES}
 )
 
