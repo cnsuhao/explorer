@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QLayout>
 #include <QMainWindow>
 #include <QWidget>
@@ -9,6 +10,10 @@
 #include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QTimer>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
 
 #include <pqActiveObjects.h>
 #include <pqAlwaysConnectedBehavior.h>
@@ -42,6 +47,8 @@
 #include "cdm/properties/SEScalarVolume.h"
 #include "cdm/properties/SEScalarMass.h"
 #include "cdm/properties/SEScalarMassPerVolume.h"
+#include "cdm/properties/SEScalarFrequency.h"
+#include "cdm/substance/SESubstance.h"
 #include "cdm/substance/SESubstanceManager.h"
 #include "cdm/patient/actions/SESubstanceBolus.h"
 
@@ -50,6 +57,15 @@ class BioGearsDemoMainWindow::pqInternals : public Ui::BioGearsDemoMainWindow
 public:
   bool FirstShow;
   QPointer<Scenario> CurrentScenario;
+
+  QPointer<QtCharts::QLineSeries> o2series;
+  QPointer<QtCharts::QChart> o2chart;
+  QPointer<QtCharts::QChartView> o2chartView;
+
+  QPointer<QtCharts::QLineSeries> volseries;
+  QPointer<QtCharts::QChart> volchart;
+  QPointer<QtCharts::QChartView> volchartView;
+  double minO2 = 0.8;
 
   pqRenderView* MainView;
 
@@ -88,16 +104,37 @@ BioGearsDemoMainWindow::BioGearsDemoMainWindow()
 
   this->setCentralWidget(this->Internals->MainView->widget());
 
-  pqXYChartView* chart =
-      qobject_cast<pqXYChartView*>(pqApplicationCore::instance()->getObjectBuilder()->createView(
-                                   pqXYChartView::XYChartViewType(),pqActiveObjects::instance().activeServer()));
+  this->Internals->o2series = new QtCharts::QLineSeries();
 
-  vtkSMProxy* proxy = chart->getProxy();
-  vtkSMPropertyHelper(proxy,"ChartTitle").Set("Test");
+  this->Internals->o2chart = new QtCharts::QChart();
+  this->Internals->o2chart->legend()->hide();
+  this->Internals->o2chart->addSeries(this->Internals->o2series);
+  this->Internals->o2chart->createDefaultAxes();
+  this->Internals->o2chart->axisY()->setRange(0,0.8);
+  this->Internals->o2chart->setTitle("Oxygen Saturation");
 
-//  this->Internals->outputDockWidget->setWidget(chart->widget());
-  qobject_cast<QHBoxLayout*>(this->Internals->outputDockWidget->widget()->layout())->insertWidget(0,chart->widget());
+  this->Internals->o2chartView = new QtCharts::QChartView(this->Internals->o2chart);
+  this->Internals->o2chartView->setRenderHint(QPainter::Antialiasing);
+  this->Internals->o2chartView->setVisible(true);
 
+  qobject_cast<QGridLayout*>(this->Internals->outputDockWidget->widget()->layout())->addWidget(this->Internals->o2chartView,0,0,1,1);
+
+  this->Internals->volseries = new QtCharts::QLineSeries();
+
+  this->Internals->volchart = new QtCharts::QChart();
+  this->Internals->volchart->legend()->hide();
+  this->Internals->volchart->addSeries(this->Internals->volseries);
+  this->Internals->volchart->createDefaultAxes();
+  this->Internals->volchart->axisY()->setRange(0,600);
+  this->Internals->volchart->setTitle("Tidal Volume");
+
+  this->Internals->volchartView = new QtCharts::QChartView(this->Internals->volchart);
+  this->Internals->volchartView->setRenderHint(QPainter::Antialiasing);
+  this->Internals->volchartView->setVisible(true);
+
+  qobject_cast<QGridLayout*>(this->Internals->outputDockWidget->widget()->layout())->addWidget(this->Internals->volchartView,0,1,1,1);
+
+  this->Internals->outputDockWidget->setVisible(false);
 
   connect(this,SIGNAL(dataChanged()), this, SLOT(updateUI()));
   connect(this->Internals->loadButton, SIGNAL(clicked()),this,SLOT(startEngine()));
@@ -125,7 +162,7 @@ void BioGearsDemoMainWindow::epiButtonPressed()
     bolus.SetAdminRoute(CDM::enumBolusAdministration::Intramuscular);
 
     bg->ProcessAction(bolus);
-    bg->GetLogger()->Info("Giving epinephrine");
+    bg->GetLogger()->Info("Giving epinephrine"); 
 }
 
 void BioGearsDemoMainWindow::playButtonPressed()
@@ -168,7 +205,29 @@ void BioGearsDemoMainWindow::keepPlaying()
 void BioGearsDemoMainWindow::updateLog()
 {
     bg->GetLogger()->Info(std::stringstream() << "Tidal Volume: " << bg->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL) << VolumeUnit::mL);
+    bg->GetLogger()->Info(std::stringstream() << "Total Volume: " << bg->GetRespiratorySystem()->GetTotalLungVolume(VolumeUnit::mL) << VolumeUnit::mL);
     bg->GetLogger()->Info(std::stringstream() << "O2 Saturation: " << bg->GetBloodChemistrySystem()->GetOxygenSaturation());
+    bg->GetLogger()->Info(std::stringstream() << "Respiratory Rate: " << bg->GetRespiratorySystem()->GetRespirationRate(FrequencyUnit::Per_min));
+    bg->GetLogger()->Info(std::stringstream() << "EC50: " << bg->GetSubstanceManager().GetSubstance("Epinephrine")->GetPD().GetEC50().GetValue(MassPerVolumeUnit::ug_Per_mL));
+    bg->GetLogger()->Info(std::stringstream() << "Conc: " << bg->GetSubstanceManager().GetSubstance("Epinephrine")->GetPlasmaConcentration(MassPerVolumeUnit::ug_Per_mL));
+
+    this->Internals->o2series->append(bg->GetSimulationTime(TimeUnit::s), bg->GetBloodChemistrySystem()->GetOxygenSaturation());
+
+    this->Internals->o2chart->axisX()->setRange(0,bg->GetSimulationTime(TimeUnit::s));
+    
+    if(bg->GetBloodChemistrySystem()->GetOxygenSaturation() < this->Internals->minO2)
+    {
+        this->Internals->minO2 = bg->GetBloodChemistrySystem()->GetOxygenSaturation();
+    }
+
+    if(this->Internals->minO2 < 0.8)
+        this->Internals->o2chart->axisY()->setRange(this->Internals->minO2,1.0);
+    else
+        this->Internals->o2chart->axisY()->setRange(0.8,1.0);
+
+    
+    this->Internals->volseries->append(bg->GetSimulationTime(TimeUnit::s), bg->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL));
+    this->Internals->volchart->axisX()->setRange(0,bg->GetSimulationTime(TimeUnit::s));
 
     QFile logFile;
     logFile.setFileName("test.log");
@@ -188,6 +247,11 @@ void BioGearsDemoMainWindow::startEngine()
     this->Internals->CurrentScenario->loadScenarioData();
 
     this->Internals->anaphylaxisGroupBox->setVisible(true);
+    this->Internals->o2chartView->setVisible(true);
+    this->Internals->volchartView->setVisible(true);
+
+    this->Internals->o2series->clear();
+    this->Internals->volseries->clear();
 
     bg = CreateBioGearsEngine("test.log");
     bg->LoadState("states/DefaultMale@0s.xml");
