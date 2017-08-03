@@ -65,7 +65,12 @@ public:
   QPointer<QtCharts::QLineSeries> volseries;
   QPointer<QtCharts::QChart> volchart;
   QPointer<QtCharts::QChartView> volchartView;
+
   double minO2 = 0.8;
+
+  double lastObstSize;
+  bool reduceObstruction = false;
+  double reduceObstRatio = 0.1/60; // Amount to reduce obstruction size per second.
 
   pqRenderView* MainView;
 
@@ -162,7 +167,10 @@ void BioGearsDemoMainWindow::epiButtonPressed()
     bolus.SetAdminRoute(CDM::enumBolusAdministration::Intramuscular);
 
     bg->ProcessAction(bolus);
-    bg->GetLogger()->Info("Giving epinephrine"); 
+    bg->GetLogger()->Info("Giving epinephrine");
+
+    this->Internals->reduceObstruction = true;
+    this->Internals->lastObstSize = this->Internals->severitySlider->value(); 
 }
 
 void BioGearsDemoMainWindow::playButtonPressed()
@@ -276,6 +284,17 @@ void BioGearsDemoMainWindow::advanceTime()
 {
     bg->AdvanceModelTime(this->Internals->timeStepBox->value(), TimeUnit::s);
 
+    if (this->Internals->reduceObstruction)
+    {
+        double newObstSize = this->Internals->lastObstSize - (this->Internals->reduceObstRatio * this->Internals->timeStepBox->value());
+
+        SEAirwayObstruction obst;
+        obst.GetSeverity().SetValue(newObstSize);
+        bg->ProcessAction(obst);
+
+        this->Internals->lastObstSize = newObstSize;
+    }
+    
     this->Internals->CurrentScenario->colorData(bg->GetBloodChemistrySystem()->GetOxygenSaturation());
 
     updateLog();
