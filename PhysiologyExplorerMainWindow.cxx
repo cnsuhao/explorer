@@ -28,8 +28,8 @@
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMReaderFactory.h>
 
-#include "BioGearsDemoMainWindow.h"
-#include "ui_BioGearsDemoMainWindow.h"
+#include "PhysiologyExplorerMainWindow.h"
+#include "ui_PhysiologyExplorerMainWindow.h"
 
 #include "Scenario.h"
 
@@ -52,7 +52,7 @@
 #include "cdm/substance/SESubstanceManager.h"
 #include "cdm/patient/actions/SESubstanceBolus.h"
 
-class BioGearsDemoMainWindow::pqInternals : public Ui::BioGearsDemoMainWindow
+class PhysiologyExplorerMainWindow::pqInternals : public Ui::PhysiologyExplorerMainWindow
 {
 public:
   bool FirstShow;
@@ -80,7 +80,7 @@ public:
   }
 };
 
-BioGearsDemoMainWindow::BioGearsDemoMainWindow()
+PhysiologyExplorerMainWindow::PhysiologyExplorerMainWindow()
 {
   playing = false;
 
@@ -152,12 +152,12 @@ BioGearsDemoMainWindow::BioGearsDemoMainWindow()
   emit dataChanged();
 }
 
-BioGearsDemoMainWindow::~BioGearsDemoMainWindow()
+PhysiologyExplorerMainWindow::~PhysiologyExplorerMainWindow()
 {
 
 }
 
-void BioGearsDemoMainWindow::epiButtonPressed()
+void PhysiologyExplorerMainWindow::epiButtonPressed()
 {
     const SESubstance* epi = bg->GetSubstanceManager().GetSubstance("Epinephrine");
 
@@ -173,7 +173,7 @@ void BioGearsDemoMainWindow::epiButtonPressed()
     this->Internals->lastObstSize = this->Internals->severitySlider->value(); 
 }
 
-void BioGearsDemoMainWindow::playButtonPressed()
+void PhysiologyExplorerMainWindow::playButtonPressed()
 {
     if (!playing)
     {
@@ -194,7 +194,7 @@ void BioGearsDemoMainWindow::playButtonPressed()
 
 }
 
-void BioGearsDemoMainWindow::pauseButtonPressed()
+void PhysiologyExplorerMainWindow::pauseButtonPressed()
 {
     playing = false;
     this->Internals->playButton->setText("Play");
@@ -202,7 +202,7 @@ void BioGearsDemoMainWindow::pauseButtonPressed()
     keepPlaying();
 }
 
-void BioGearsDemoMainWindow::keepPlaying()
+void PhysiologyExplorerMainWindow::keepPlaying()
 {
     if(playing)
         advanceTime();
@@ -210,7 +210,7 @@ void BioGearsDemoMainWindow::keepPlaying()
         playTimer->stop();
 }
 
-void BioGearsDemoMainWindow::updateLog()
+void PhysiologyExplorerMainWindow::updateLog()
 {
     bg->GetLogger()->Info(std::stringstream() << "Tidal Volume: " << bg->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL) << VolumeUnit::mL);
     bg->GetLogger()->Info(std::stringstream() << "Total Volume: " << bg->GetRespiratorySystem()->GetTotalLungVolume(VolumeUnit::mL) << VolumeUnit::mL);
@@ -249,7 +249,7 @@ void BioGearsDemoMainWindow::updateLog()
     }
 }
 
-void BioGearsDemoMainWindow::startEngine()
+void PhysiologyExplorerMainWindow::startEngine()
 {
     this->Internals->CurrentScenario = new Scenario(this->Internals->MainView, this);
     this->Internals->CurrentScenario->loadScenarioData();
@@ -271,7 +271,7 @@ void BioGearsDemoMainWindow::startEngine()
     emit dataChanged();
 }
 
-void BioGearsDemoMainWindow::addObstruction()
+void PhysiologyExplorerMainWindow::addObstruction()
 {
     SEAirwayObstruction obst;
     obst.GetSeverity().SetValue(this->Internals->severitySlider->value());
@@ -280,7 +280,7 @@ void BioGearsDemoMainWindow::addObstruction()
     updateLog();
 }
 
-void BioGearsDemoMainWindow::advanceTime()
+void PhysiologyExplorerMainWindow::advanceTime()
 {
     bg->AdvanceModelTime(this->Internals->timeStepBox->value(), TimeUnit::s);
 
@@ -302,7 +302,7 @@ void BioGearsDemoMainWindow::advanceTime()
     emit dataChanged();
 }
 
-void BioGearsDemoMainWindow::updateUI()
+void PhysiologyExplorerMainWindow::updateUI()
 {
     this->Internals->MainView->render();
 }

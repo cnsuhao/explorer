@@ -25,10 +25,10 @@ ExternalPRoject_Add(BioGears
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/Install
 )
 
-ExternalProject_Add(BioGearsDemo
+ExternalProject_Add(PhysiologyExplorer
 	DEPENDS ParaView BioGears
 	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-	BINARY_DIR ${CMAKE_BINARY_DIR}/BioGearsDemo-build
+	BINARY_DIR ${CMAKE_BINARY_DIR}/PhysiologyExplorer-build
 	INSTALL_DIR ${CMAKE_BINARY_DIR}/Install
 	CMAKE_ARGS
 		-DDO_SUPERBUILD:BOOL=OFF

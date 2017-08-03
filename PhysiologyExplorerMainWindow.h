@@ -1,5 +1,5 @@
-#ifndef BIOGEARSDEMOMAINWINDOW_H
-#define BIOGEARSDEMOMAINWINDOW_H
+#ifndef PhysiologyExplorerMainWindow_H
+#define PhysiologyExplorerMainWindow_H
 
 #include <QMainWindow>
 
@@ -11,16 +11,16 @@
 #include "cdm/properties/SEScalarVolume.h"
 
 namespace Ui {
-  class BioGearsDemoMainWindow;
+  class PhysiologyExplorerMainWindow;
 }
 
-class BioGearsDemoMainWindow : public QMainWindow
+class PhysiologyExplorerMainWindow : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  BioGearsDemoMainWindow();
-  ~BioGearsDemoMainWindow();
+  PhysiologyExplorerMainWindow();
+  ~PhysiologyExplorerMainWindow();
 
 signals:
   void dataChanged();
@@ -47,4 +47,4 @@ private:
   QTimer* playTimer;
 };
 
-#endif // BIOGEARSDEMOMAINWINDOW_H
+#endif // PhysiologyExplorerMainWindow_H

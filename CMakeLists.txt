@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-set(project_name BioGearsDemo)
+set(project_name PhysiologyExplorer)
 project(${project_name})
 
 set(${project_name}_CMAKE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
@@ -104,7 +104,7 @@ else()
 endif()
 
 build_paraview_client(${project_name}
-  TITLE "BioGears Demo"
+  TITLE "Physiology Explorer"
   ORGANIZATION  "Kitware, Inc."
   VERSION_MAJOR 0
   VERSION_MINOR 1
