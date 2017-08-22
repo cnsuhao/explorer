@@ -96,11 +96,11 @@ LINK_DIRECTORIES(
 SET(BIOGEARS_LIB_DIR "${CMAKE_INSTALL_PREFIX}/bin/${lower_build_type}")
 
 if (WIN32)
-  SET(LIB_ENDING "dll")
+  SET(LIB_ENDING "lib")
 elseif (APPLE)
-  SET(LIB_ENDING "dylib")
+  SET(LIB_ENDING "a")
 else()
-  SET(LIB_ENDING "so")
+  SET(LIB_ENDING "a")
 endif()
 
 build_paraview_client(${project_name}
@@ -112,7 +112,12 @@ build_paraview_client(${project_name}
 #  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"
   PVMAIN_WINDOW ${project_name}MainWindow
   PVMAIN_WINDOW_INCLUDE ${project_name}MainWindow.h
-  EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering log4cpp ${BIOGEARS_LIB_DIR}/BioGearsEngine.${LIB_ENDING} ${BIOGEARS_LIB_DIR}/CommonDataModel.${LIB_ENDING} ${BIOGEARS_LIB_DIR}/CommonDataModelJNI.${LIB_ENDING} ${BIOGEARS_LIB_DIR}/DataModelBindings.${LIB_ENDING}
+  EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering  
+                     ${BIOGEARS_LIB_DIR}/PulseEngine.${LIB_ENDING} 
+                     ${BIOGEARS_LIB_DIR}/CommonDataModel.${LIB_ENDING} 
+                     ${BIOGEARS_LIB_DIR}/DataModelBindings.${LIB_ENDING}
+                     ${BIOGEARS_LIB_DIR}/log4cpp.${LIB_ENDING}
+                     ${BIOGEARS_LIB_DIR}/libprotobuf.${LIB_ENDING}
   SOURCES ${${project_name}_SOURCE_FILES}
 )
 
