@@ -103,6 +103,8 @@ else()
   SET(LIB_ENDING "a")
 endif()
 
+file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
 build_paraview_client(${project_name}
   TITLE "Physiology Explorer"
   ORGANIZATION  "Kitware, Inc."
