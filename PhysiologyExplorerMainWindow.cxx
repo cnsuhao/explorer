@@ -239,7 +239,7 @@ void PhysiologyExplorerMainWindow::updateLog()
     this->Internals->volchart->axisX()->setRange(0,pulse->GetSimulationTime(TimeUnit::s));
 
     QFile logFile;
-    logFile.setFileName("test.log");
+    logFile.setFileName("Explorer.log");
     logFile.open(QIODevice::ReadOnly | QIODevice::Text);
 
     this->Internals->logOutput->clear();
