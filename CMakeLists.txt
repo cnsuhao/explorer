@@ -131,3 +131,78 @@ build_paraview_client(${project_name}
   SOURCES ${${project_name}_SOURCE_FILES}
 )
 
+# Need to support debug still
+if(WIN32)
+  set(postfix)#for debug builds this should be "d"
+  set(Qt_DLLs 
+    ${Qt5_DIR}/../../../bin/d3dcompiler_47.dll
+    ${Qt5_DIR}/../../../bin/libEGL${postfix}.dll
+    ${Qt5_DIR}/../../../bin/libGLESv2${postfix}.dll
+    ${Qt5_DIR}/../../../bin/opengl32sw.dll
+    ${Qt5_DIR}/../../../bin/Qt5Bluetooth${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Charts${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Concurrent${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Core${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5DataVisualization${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5DBus${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Designer${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5DesignerComponents${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Gamepad${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Gui${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Help${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Location${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Multimedia${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5MultimediaQuick_p${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5MultimediaWidgets${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Network${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5NetworkAuth${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Nfc${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5OpenGL${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Positioning${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5PrintSupport${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Purchasing${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Qml${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Quick${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5QuickControls2${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5QuickParticles${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5QuickTemplates2${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5QuickTest${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5QuickWidgets${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5RemoteObjects${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Script${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5ScriptTools${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Scxml${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Sensors${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5SerialBus${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5SerialPort${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Sql${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Svg${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Test${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5TextToSpeech${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WebChannel${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WebEngine${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WebEngineCore${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WebEngineWidgets${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WebSockets${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WebView${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Widgets${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5WinExtras${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5Xml${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt5XmlPatterns${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DAnimation${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DCore${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DExtras${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DInput${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DLogic${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DQuick${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DQuickAnimation${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DQuickExtras${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DQuickInput${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DQuickRender${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DQuickScene2D${postfix}.dll
+    ${Qt5_DIR}/../../../bin/Qt53DRender${postfix}.dll
+  )
+  install(FILES ${Qt_DLLs} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+  install(DIRECTORY ${Qt5_DIR}/../../../plugins/platforms DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif()
+
