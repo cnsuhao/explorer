@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.7)
 set(project_name PhysiologyExplorer)
 project(${project_name})
 
@@ -14,14 +14,11 @@ if (DO_SUPERBUILD)
 	return()
 endif()
 
+set(ParaView_DIR ${CMAKE_INSTALL_PREFIX}/../ParaView-build)
 find_package(ParaView REQUIRED)
-include (${PARAVIEW_USE_FILE})
 if (NOT PARAVIEW_BUILD_QT_GUI)
 	status(FATAL_ERROR "${project_name} requires ParaView to be built with Qt")
 endif()
-
-# include rules for creating custom applications.
-include(ParaViewBranding)
 
 # Set a consistent MACOSX_RPATH default across all CMake versions.
 # When CMake 2.8.12 is required, change this default to 1.
@@ -32,17 +29,17 @@ endif()
 
 # Set up our directory structure for output libraries and binaries
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${${project_name}_BINARY_DIR}/bin")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin")
 endif()
 if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
   if(UNIX)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${${project_name}_BINARY_DIR}/lib")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/lib")
   else()
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${${project_name}_BINARY_DIR}/bin")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin")
   endif()
 endif()
 if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${${project_name}_BINARY_DIR}/lib")
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
 set(moc_sources
@@ -83,17 +80,21 @@ SET(${project_name}_SOURCE_FILES
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
-  "${CMAKE_BINARY_DIR}/../Install/include/"
-  "${CMAKE_BINARY_DIR}/../Install/include/cdm"
+  "${CMAKE_INSTALL_PREFIX}/../install/include/"
+  "${CMAKE_INSTALL_PREFIX}/../install/include/cdm"
+  "${CMAKE_INSTALL_PREFIX}/../install/include/bind"
   )
 
-string(TOLOWER "${CMAKE_BUILD_TYPE}" lower_build_type)
+set(CONFIG)
+if(MSVC)
+ set(CONFIG "/$(Configuration)")
+endif()
 
-LINK_DIRECTORIES(
-  "${CMAKE_CURRENT_BINARY_DIR}/../Install/lib/${lower_build_type}"
-  )
+#LINK_DIRECTORIES(
+#  "${CMAKE_CURRENT_BINARY_DIR}/../install/lib${CONFIG}"
+#  )
 
-SET(BIOGEARS_LIB_DIR "${CMAKE_INSTALL_PREFIX}/bin/${lower_build_type}")
+SET(PULSE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib${CONFIG}")
 
 if (WIN32)
   SET(LIB_ENDING "lib")
@@ -103,10 +104,17 @@ else()
   SET(LIB_ENDING "a")
 endif()
 
-file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
+
+set(CMAKE_MODULE_PATH ${ParaView_CMAKE_DIR})
+include (${PARAVIEW_USE_FILE})
+# include rules for creating custom applications.
+include(ParaViewBranding)
+
+file(COPY data DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 build_paraview_client(${project_name}
-  TITLE "Physiology Explorer"
+  TITLE "Pulse Physiology Explorer"
   ORGANIZATION  "Kitware, Inc."
   VERSION_MAJOR 0
   VERSION_MINOR 1
@@ -114,12 +122,12 @@ build_paraview_client(${project_name}
 #  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"
   PVMAIN_WINDOW ${project_name}MainWindow
   PVMAIN_WINDOW_INCLUDE ${project_name}MainWindow.h
-  EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering  
-                     ${BIOGEARS_LIB_DIR}/PulseEngine.${LIB_ENDING} 
-                     ${BIOGEARS_LIB_DIR}/CommonDataModel.${LIB_ENDING} 
-                     ${BIOGEARS_LIB_DIR}/DataModelBindings.${LIB_ENDING}
-                     ${BIOGEARS_LIB_DIR}/log4cpp.${LIB_ENDING}
-                     ${BIOGEARS_LIB_DIR}/libprotobuf.${LIB_ENDING}
+  EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering
+                     ${PULSE_LIB_DIR}/PulseEngine.${LIB_ENDING} 
+                     ${PULSE_LIB_DIR}/CommonDataModel.${LIB_ENDING} 
+                     ${PULSE_LIB_DIR}/DataModelBindings.${LIB_ENDING}
+                     ${PULSE_LIB_DIR}/log4cpp.${LIB_ENDING}
+                     ${PULSE_LIB_DIR}/libprotobuf.${LIB_ENDING}
   SOURCES ${${project_name}_SOURCE_FILES}
 )
 

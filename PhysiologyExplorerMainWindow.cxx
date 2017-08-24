@@ -33,7 +33,7 @@
 
 #include "Scenario.h"
 
-#include "BioGearsPhysiologyEngine.h"
+#include "PulsePhysiologyEngine.h"
 #include "cdm/patient/SEPatient.h"
 #include "cdm/system/physiology/SECardiovascularSystem.h"
 #include "cdm/system/physiology/SEBloodChemistrySystem.h"
@@ -41,7 +41,7 @@
 #include "cdm/patient/actions/SECardiacArrest.h"
 #include "cdm/patient/actions/SEAirwayObstruction.h"
 #include "cdm/CommonDataModel.h"
-#include "cdm/engine/PhysiologyEngine.h"
+#include "cdm/PhysiologyEngine.h"
 #include "cdm/properties/SEScalarTime.h"
 #include "cdm/properties/SEScalar0To1.h"
 #include "cdm/properties/SEScalarVolume.h"
@@ -95,6 +95,7 @@ PhysiologyExplorerMainWindow::PhysiologyExplorerMainWindow()
   this->Internals->inputDockWidget->show();
   this->Internals->inputDockWidget->raise();
 
+  this->Internals->engineGroupBox->setVisible(true);
   this->Internals->outputDockWidget->setTitleBarWidget(new QWidget());
   this->Internals->outputDockWidget->show();
   this->Internals->outputDockWidget->raise();
@@ -139,7 +140,7 @@ PhysiologyExplorerMainWindow::PhysiologyExplorerMainWindow()
 
   qobject_cast<QGridLayout*>(this->Internals->outputDockWidget->widget()->layout())->addWidget(this->Internals->volchartView,0,1,1,1);
 
-  this->Internals->outputDockWidget->setVisible(false);
+  this->Internals->outputDockWidget->setVisible(true);
 
   connect(this,SIGNAL(dataChanged()), this, SLOT(updateUI()));
   connect(this->Internals->loadButton, SIGNAL(clicked()),this,SLOT(startEngine()));
@@ -159,15 +160,15 @@ PhysiologyExplorerMainWindow::~PhysiologyExplorerMainWindow()
 
 void PhysiologyExplorerMainWindow::epiButtonPressed()
 {
-    const SESubstance* epi = bg->GetSubstanceManager().GetSubstance("Epinephrine");
+    const SESubstance* epi = pulse->GetSubstanceManager().GetSubstance("Epinephrine");
 
     SESubstanceBolus bolus(*epi);
     bolus.GetConcentration().SetValue(1,MassPerVolumeUnit::g_Per_L);
     bolus.GetDose().SetValue(0.3,VolumeUnit::mL);
-    bolus.SetAdminRoute(CDM::enumBolusAdministration::Intramuscular);
+    bolus.SetAdminRoute(cdm::SubstanceBolusData_eAdministrationRoute_Intravenous);
 
-    bg->ProcessAction(bolus);
-    bg->GetLogger()->Info("Giving epinephrine");
+    pulse->ProcessAction(bolus);
+    pulse->GetLogger()->Info("Giving epinephrine");
 
     this->Internals->reduceObstruction = true;
     this->Internals->lastObstSize = this->Internals->severitySlider->value(); 
@@ -212,20 +213,20 @@ void PhysiologyExplorerMainWindow::keepPlaying()
 
 void PhysiologyExplorerMainWindow::updateLog()
 {
-    bg->GetLogger()->Info(std::stringstream() << "Tidal Volume: " << bg->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    bg->GetLogger()->Info(std::stringstream() << "Total Volume: " << bg->GetRespiratorySystem()->GetTotalLungVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    bg->GetLogger()->Info(std::stringstream() << "O2 Saturation: " << bg->GetBloodChemistrySystem()->GetOxygenSaturation());
-    bg->GetLogger()->Info(std::stringstream() << "Respiratory Rate: " << bg->GetRespiratorySystem()->GetRespirationRate(FrequencyUnit::Per_min));
-    bg->GetLogger()->Info(std::stringstream() << "EC50: " << bg->GetSubstanceManager().GetSubstance("Epinephrine")->GetPD().GetEC50().GetValue(MassPerVolumeUnit::ug_Per_mL));
-    bg->GetLogger()->Info(std::stringstream() << "Conc: " << bg->GetSubstanceManager().GetSubstance("Epinephrine")->GetPlasmaConcentration(MassPerVolumeUnit::ug_Per_mL));
+    pulse->GetLogger()->Info(std::stringstream() << "Tidal Volume: " << pulse->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL) << VolumeUnit::mL);
+    pulse->GetLogger()->Info(std::stringstream() << "Total Volume: " << pulse->GetRespiratorySystem()->GetTotalLungVolume(VolumeUnit::mL) << VolumeUnit::mL);
+    pulse->GetLogger()->Info(std::stringstream() << "O2 Saturation: " << pulse->GetBloodChemistrySystem()->GetOxygenSaturation());
+    pulse->GetLogger()->Info(std::stringstream() << "Respiratory Rate: " << pulse->GetRespiratorySystem()->GetRespirationRate(FrequencyUnit::Per_min));
+    pulse->GetLogger()->Info(std::stringstream() << "EC50: " << pulse->GetSubstanceManager().GetSubstance("Epinephrine")->GetPD().GetEC50().GetValue(MassPerVolumeUnit::ug_Per_mL));
+    pulse->GetLogger()->Info(std::stringstream() << "Conc: " << pulse->GetSubstanceManager().GetSubstance("Epinephrine")->GetPlasmaConcentration(MassPerVolumeUnit::ug_Per_mL));
 
-    this->Internals->o2series->append(bg->GetSimulationTime(TimeUnit::s), bg->GetBloodChemistrySystem()->GetOxygenSaturation());
+    this->Internals->o2series->append(pulse->GetSimulationTime(TimeUnit::s), pulse->GetBloodChemistrySystem()->GetOxygenSaturation());
 
-    this->Internals->o2chart->axisX()->setRange(0,bg->GetSimulationTime(TimeUnit::s));
+    this->Internals->o2chart->axisX()->setRange(0,pulse->GetSimulationTime(TimeUnit::s));
     
-    if(bg->GetBloodChemistrySystem()->GetOxygenSaturation() < this->Internals->minO2)
+    if(pulse->GetBloodChemistrySystem()->GetOxygenSaturation() < this->Internals->minO2)
     {
-        this->Internals->minO2 = bg->GetBloodChemistrySystem()->GetOxygenSaturation();
+        this->Internals->minO2 = pulse->GetBloodChemistrySystem()->GetOxygenSaturation();
     }
 
     if(this->Internals->minO2 < 0.8)
@@ -234,8 +235,8 @@ void PhysiologyExplorerMainWindow::updateLog()
         this->Internals->o2chart->axisY()->setRange(0.8,1.0);
 
     
-    this->Internals->volseries->append(bg->GetSimulationTime(TimeUnit::s), bg->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL));
-    this->Internals->volchart->axisX()->setRange(0,bg->GetSimulationTime(TimeUnit::s));
+    this->Internals->volseries->append(pulse->GetSimulationTime(TimeUnit::s), pulse->GetRespiratorySystem()->GetTidalVolume(VolumeUnit::mL));
+    this->Internals->volchart->axisX()->setRange(0,pulse->GetSimulationTime(TimeUnit::s));
 
     QFile logFile;
     logFile.setFileName("test.log");
@@ -261,10 +262,10 @@ void PhysiologyExplorerMainWindow::startEngine()
     this->Internals->o2series->clear();
     this->Internals->volseries->clear();
 
-    bg = CreateBioGearsEngine("test.log");
-    bg->LoadState("states/DefaultMale@0s.xml");
-    bg->GetLogger()->SetLogLevel(log4cpp::Priority::DEBUG);
-    bg->GetLogger()->Info("BioGears engine started");
+    pulse = CreatePulseEngine("Explorer.log");
+    pulse->LoadStateFile("states/StandardMale@0s.pba");
+    pulse->GetLogger()->SetLogLevel(log4cpp::Priority::DEBUG);
+    pulse->GetLogger()->Info("Pulse engine started");
 
     updateLog();
 
@@ -275,14 +276,14 @@ void PhysiologyExplorerMainWindow::addObstruction()
 {
     SEAirwayObstruction obst;
     obst.GetSeverity().SetValue(this->Internals->severitySlider->value());
-    bg->ProcessAction(obst);
+    pulse->ProcessAction(obst);
 
     updateLog();
 }
 
 void PhysiologyExplorerMainWindow::advanceTime()
 {
-    bg->AdvanceModelTime(this->Internals->timeStepBox->value(), TimeUnit::s);
+    pulse->AdvanceModelTime(this->Internals->timeStepBox->value(), TimeUnit::s);
 
     if (this->Internals->reduceObstruction)
     {
@@ -290,12 +291,12 @@ void PhysiologyExplorerMainWindow::advanceTime()
 
         SEAirwayObstruction obst;
         obst.GetSeverity().SetValue(newObstSize);
-        bg->ProcessAction(obst);
+        pulse->ProcessAction(obst);
 
         this->Internals->lastObstSize = newObstSize;
     }
     
-    this->Internals->CurrentScenario->colorData(bg->GetBloodChemistrySystem()->GetOxygenSaturation());
+    this->Internals->CurrentScenario->colorData(pulse->GetBloodChemistrySystem()->GetOxygenSaturation());
 
     updateLog();
 

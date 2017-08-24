@@ -3,9 +3,9 @@
 
 #include <QMainWindow>
 
-#include "BioGearsPhysiologyEngine.h"
+#include "PulsePhysiologyEngine.h"
 #include "cdm/CommonDataModel.h"
-#include "cdm/engine/PhysiologyEngine.h"
+#include "cdm/PhysiologyEngine.h"
 #include "cdm/properties/SEScalarTime.h"
 #include "cdm/properties/SEScalar0To1.h"
 #include "cdm/properties/SEScalarVolume.h"
@@ -39,7 +39,7 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  std::unique_ptr<PhysiologyEngine> bg;
+  std::unique_ptr<PhysiologyEngine> pulse;
   bool playing;
 
   void updateLog();
