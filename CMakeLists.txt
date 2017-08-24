@@ -85,9 +85,11 @@ INCLUDE_DIRECTORIES(
   "${CMAKE_INSTALL_PREFIX}/../install/include/bind"
   )
 
-set(CONFIG)
 if(MSVC)
  set(CONFIG "/$(Configuration)")
+else()
+ string(TOLOWER "${CMAKE_BUILD_TYPE}" lower_build_type)
+ set(CONFIG "/${lower_build_type}")
 endif()
 
 #LINK_DIRECTORIES(
@@ -113,6 +115,12 @@ include(ParaViewBranding)
 
 file(COPY data DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
+if(MSVC)
+ set(LOG4CPP_LIB "log4cpp")
+else()
+ set(LOG4CPP_LIB "liblog4cpp")
+endif()
+
 build_paraview_client(${project_name}
   TITLE "Pulse Physiology Explorer"
   ORGANIZATION  "Kitware, Inc."
@@ -126,7 +134,7 @@ build_paraview_client(${project_name}
                      ${PULSE_LIB_DIR}/PulseEngine.${LIB_ENDING} 
                      ${PULSE_LIB_DIR}/CommonDataModel.${LIB_ENDING} 
                      ${PULSE_LIB_DIR}/DataModelBindings.${LIB_ENDING}
-                     ${PULSE_LIB_DIR}/log4cpp.${LIB_ENDING}
+                     ${PULSE_LIB_DIR}/${LOG4CPP_LIB}.${LIB_ENDING}
                      ${PULSE_LIB_DIR}/libprotobuf.${LIB_ENDING}
   SOURCES ${${project_name}_SOURCE_FILES}
 )
