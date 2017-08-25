@@ -1,4 +1,7 @@
 include(ExternalProject)
+project(OuterBuild)
+
+find_package(Qt5 COMPONENTS Core Widgets Charts REQUIRED)
 
 ExternalProject_Add(ParaView
   PREFIX ParaView
@@ -22,7 +25,7 @@ ExternalProject_Add(ParaView
 ExternalPRoject_Add(Pulse
   PREFIX Pulse
   GIT_REPOSITORY https://gitlab.kitware.com/physiology/engine.git
-  GIT_TAG bf8326be0cfdebbebc9ca63b5f4987f4ab56ee4f
+  GIT_TAG v1.0
   GIT_SHALLOW 1
   BINARY_DIR ${CMAKE_BINARY_DIR}/Pulse-build
   INSTALL_DIR ${CMAKE_BINARY_DIR}/install

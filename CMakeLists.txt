@@ -1,18 +1,16 @@
 cmake_minimum_required(VERSION 3.7)
+
+# Superbuild stuff
+option(DO_SUPERBUILD "Download and build any project dependencies" ON)
+if (DO_SUPERBUILD)
+	include("CMake/Superbuild.cmake")
+	return()
+endif()
+
 set(project_name PhysiologyExplorer)
 project(${project_name})
 
 set(${project_name}_CMAKE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
-
-find_package(Qt5 COMPONENTS Core Widgets Charts REQUIRED)
-
-# Superbuild stuff
-option(DO_SUPERBUILD "Build ${project_name}'s dependencies" ON)
-
-if (DO_SUPERBUILD)
-	include("${${project_name}_CMAKE_SOURCE_DIR}/Superbuild.cmake")
-	return()
-endif()
 
 set(ParaView_DIR ${CMAKE_INSTALL_PREFIX}/../ParaView-build)
 find_package(ParaView REQUIRED)
