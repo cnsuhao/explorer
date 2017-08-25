@@ -35,6 +35,7 @@ sudo apt-get install curl
 ### Qt
 
 It currently does not pull Qt. You will need to download and install Qtv5 on your own.
+You can get it from <a href="https://www.qt.io/download-open-source/">here</a>
 
 ### Java JDK
 
@@ -91,7 +92,7 @@ cd builds
 # Run CMake (it will use the system default compiler if you don't provide options or use the CMake GUI)
 cmake -DCMAKE_BUILD_TYPE:STRING=Release ../src
 # Note you will need to provide the path to Qt if it is not on the PATH
-cmake -DCMAKE_BUILD_TYPE:STRING=Release -DQt5_DIR=C:\Programming\Tools\Qt\5.9.1\msvc2017_64\lib\cmake\Qt5 ../src
+cmake -DCMAKE_BUILD_TYPE:STRING=Release -DQt5_DIR=C:/Programming/Tools/Qt/5.9.1/msvc2017_64/lib/cmake/Qt5 ../src
 
 # Build the install target/project
 # On Linux/OSX/MinGW 
@@ -114,7 +115,7 @@ you will need to remove the Qt PhysiologyExplorer0.1.0.ini file from your system
 
 It can be found in your user directory ./configs
 Or on windows:
-C:\Users\<login>\AppData\Roaming\Kitware, Inc
+C:\Users\your_login\AppData\Roaming\Kitware, Inc
 
 If you find any other issues, please do not hesitate to log any issue in our repository.
 
