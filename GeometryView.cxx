@@ -1,10 +1,13 @@
-#include "Scenario.h"
-
-#include "FileLoader.h"
+#include "GeometryView.h"
 
 #include <QColor>
 #include <QList>
 #include <QVariant>
+#include <QString>
+#include <QStringList>
+
+#include <pqLoadDataReaction.h>
+#include <pqPipelineSource.h>
 
 #include <pqApplicationCore.h>
 #include <pqObjectBuilder.h>
@@ -17,21 +20,31 @@
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMPVRepresentationProxy.h>
 
-Scenario::Scenario(pqRenderView* view, QObject* parentObject) :
-    m_View(view)
+GeometryView::GeometryView(pqRenderView* view, QObject* parentObject) : m_View(view)
 {
 }
 
-Scenario::~Scenario()
+GeometryView::~GeometryView()
 {
 }
 
-void Scenario::loadScenarioData()
+pqPipelineSource* loadDataFile(const QString & filePath)
+{
+  QStringList file;
+  file << filePath;
+  QList<QStringList> files;
+  files << file;
+
+  pqPipelineSource* source = pqLoadDataReaction::loadData(files);
+
+  return source;
+}
+
+void GeometryView::LoadGeometry()
 {
     vtkSMProxy* renderProxy = m_View->getProxy();
-//    this->m_DataSources.push_back(FileLoader::loadDataFile("data/Segment_0.vtp"));
     // Read in lungs
-    this->m_DataSources.push_back(FileLoader::loadDataFile("data/lungs.vtp"));
+    this->m_DataSources.push_back(loadDataFile("data/lungs.vtp"));
     this->m_DataRepresentations.push_back(pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(m_DataSources[0]->getOutputPort(0), m_View));
 
     vtkSMProxy* lungProxy = m_DataRepresentations[0]->getProxy();
@@ -57,14 +70,14 @@ void Scenario::loadScenarioData()
     lungProxy->UpdateProperty("DiffuseColor");
 
     // Read in trachea/bronchus
-    this->m_DataSources.push_back(FileLoader::loadDataFile("data/trachea.vtp"));
+    this->m_DataSources.push_back(loadDataFile("data/trachea.vtp"));
     this->m_DataRepresentations.push_back(pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(m_DataSources[1]->getOutputPort(0), m_View));
 
-    this->m_DataSources.push_back(FileLoader::loadDataFile("data/bronchus.vtp"));
+    this->m_DataSources.push_back(loadDataFile("data/bronchus.vtp"));
     this->m_DataRepresentations.push_back(pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(m_DataSources[2]->getOutputPort(0), m_View));
 
     // Read in skin
-    this->m_DataSources.push_back(FileLoader::loadDataFile("data/skin.vtp"));
+    this->m_DataSources.push_back(loadDataFile("data/skin.vtp"));
     this->m_DataRepresentations.push_back(pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(m_DataSources[3]->getOutputPort(0), m_View));
 
     vtkSMProxy* skinProxy = m_DataRepresentations[3]->getProxy();
@@ -88,21 +101,21 @@ void Scenario::loadScenarioData()
     renderProxy->UpdateVTKObjects();
 }
 
-void Scenario::colorData(double o2sat)
+void GeometryView::RenderSPO2(double spO2)
 {
-    std::cout << "Coloring by " << o2sat << std::endl;
+    std::cout << "Coloring by " << spO2 << std::endl;
     QColor color;
 
-    if (o2sat >= 0.95)
+    if (spO2 >= 0.95)
         color = QColor(255,115,170);
-    else if (o2sat <= 0.90)
+    else if (spO2 <= 0.90)
         color = QColor(Qt::blue);
     else
     {
         QColor color1(255,115,170);
         QColor color2(Qt::blue);
 
-        double t = (0.95 - o2sat) / 0.05; // fraction of distance from 0.95 to 0.90
+        double t = (0.95 - spO2) / 0.05; // fraction of distance from 0.95 to 0.90
 
         std::cout << "Using t=" << t << std::endl;
 

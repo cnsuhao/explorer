@@ -41,9 +41,13 @@ if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 endif()
 
 set(moc_sources
-  ${project_name}MainWindow.h
-  FileLoader.h
-  Scenario.h
+  MainExplorerWindow.h
+  QPulse.h
+  GeometryView.h
+  ExplorerIntroWidget.h
+  VitalsMonitorWidget.h
+  DataRequestsWidget.h
+  AnaphylaxisShowcaseWidget.h
 )
 
 #------------------------------------------------------------------------------
@@ -52,13 +56,20 @@ IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   QT5_WRAP_CPP(MOC_BUILT_SOURCES
     ${moc_sources})
   QT5_WRAP_UI(UI_BUILT_SOURCES
-    ${project_name}MainWindow.ui)
+    MainExplorerWindow.ui 
+    ExplorerIntro.ui 
+    AnaphylaxisShowcase.ui)
 ELSE ()
   QT4_WRAP_CPP(MOC_BUILT_SOURCES
     ${moc_sources})
   QT4_WRAP_UI(UI_BUILT_SOURCES
-    ${project_name}MainWindow.ui)
+    MainExplorerWindow.ui 
+    ExplorerIntro.ui 
+    AnaphylaxisShowcase.ui)
 ENDIF ()
+
+set(Pulse_DIR ${CMAKE_INSTALL_PREFIX}/../install)
+find_package(Pulse REQUIRED)
 
 SOURCE_GROUP("Generated" FILES
   ${MOC_BUILT_SOURCES}
@@ -66,45 +77,30 @@ SOURCE_GROUP("Generated" FILES
 )
 
 SET(${project_name}_SOURCE_FILES
-  ${project_name}MainWindow.cxx
-  ${project_name}MainWindow.h
-  FileLoader.cxx
-  FileLoader.h
-  Scenario.cxx
-  Scenario.h
+  MainExplorerWindow.cxx
+  MainExplorerWindow.h
+  QPulse.cxx
+  QPulse.h
+  GeometryView.cxx
+  GeometryView.h
+  vtkWaveformWidget.cxx
+  vtkWaveformWidget.h
+  DataRequestsWidget.cxx
+  DataRequestsWidget.h
+  VitalsMonitorWidget.cxx
+  VitalsMonitorWidget.h
+  ExplorerIntroWidget.cxx
+  ExplorerIntroWidget.h
+  AnaphylaxisShowcaseWidget.cxx
+  AnaphylaxisShowcaseWidget.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
-  "${CMAKE_INSTALL_PREFIX}/../install/include/"
-  "${CMAKE_INSTALL_PREFIX}/../install/include/cdm"
-  "${CMAKE_INSTALL_PREFIX}/../install/include/bind"
+  ${Pulse_INCLUDE_DIRS}
   )
-
-if(MSVC)
- set(CONFIG "/$(Configuration)")
-else()
- string(TOLOWER "${CMAKE_BUILD_TYPE}" lower_build_type)
- set(CONFIG "/${lower_build_type}")
-endif()
-
-#LINK_DIRECTORIES(
-#  "${CMAKE_CURRENT_BINARY_DIR}/../install/lib${CONFIG}"
-#  )
-
-SET(PULSE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib${CONFIG}")
-
-if (WIN32)
-  SET(LIB_ENDING "lib")
-elseif (APPLE)
-  SET(LIB_ENDING "a")
-else()
-  SET(LIB_ENDING "a")
-endif()
-
-
 
 set(CMAKE_MODULE_PATH ${ParaView_CMAKE_DIR})
 include (${PARAVIEW_USE_FILE})
@@ -113,12 +109,6 @@ include(ParaViewBranding)
 
 file(COPY data DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-if(MSVC)
- set(LOG4CPP_LIB "log4cpp")
-else()
- set(LOG4CPP_LIB "liblog4cpp")
-endif()
-
 build_paraview_client(${project_name}
   TITLE "Pulse Physiology Explorer"
   ORGANIZATION  "Kitware, Inc."
@@ -126,14 +116,10 @@ build_paraview_client(${project_name}
   VERSION_MINOR 1
   VERSION_PATCH 0
 #  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"
-  PVMAIN_WINDOW ${project_name}MainWindow
-  PVMAIN_WINDOW_INCLUDE ${project_name}MainWindow.h
+  PVMAIN_WINDOW MainExplorerWindow
+  PVMAIN_WINDOW_INCLUDE MainExplorerWindow.h
   EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering
-                     ${PULSE_LIB_DIR}/PulseEngine.${LIB_ENDING} 
-                     ${PULSE_LIB_DIR}/CommonDataModel.${LIB_ENDING} 
-                     ${PULSE_LIB_DIR}/DataModelBindings.${LIB_ENDING}
-                     ${PULSE_LIB_DIR}/${LOG4CPP_LIB}.${LIB_ENDING}
-                     ${PULSE_LIB_DIR}/libprotobuf.${LIB_ENDING}
+                     ${Pulse_LIBS}
   SOURCES ${${project_name}_SOURCE_FILES}
 )
 
