@@ -6,8 +6,10 @@
 #include "cdm/system/physiology/SEBloodChemistrySystem.h"
 #include "cdm/system/physiology/SECardiovascularSystem.h"
 #include "cdm/system/physiology/SERespiratorySystem.h"
+#include "cdm/system/equipment/electrocardiogram/SEElectroCardioGram.h"
 #include "cdm/properties/SEScalarFrequency.h"
 #include "cdm/properties/SEScalarPressure.h"
+#include "cdm/Properties/SEScalarElectricPotential.h"
 
 class VitalsMonitorWidget::Controls
 {
@@ -15,6 +17,7 @@ public:
   Controls(QTextEdit& log) : LogBox(log) {}
   QTextEdit&  LogBox;
   double      HeartRate_bpm;
+  double      ECG_III_mV;
   double      ArterialPressure_mmHg;
   double      DiastolicPressure_mmHg;
   double      SystolicPressure_mmHg;
@@ -48,6 +51,7 @@ void VitalsMonitorWidget::ProcessPhysiology(PhysiologyEngine& pulse)
   // This is where we pull data from pulse, and push any actions to it
   m_Controls->Mutex.lock();
   m_Controls->HeartRate_bpm = pulse.GetCardiovascularSystem()->GetHeartRate(FrequencyUnit::Per_min);
+  m_Controls->ECG_III_mV = pulse.GetElectroCardioGram()->GetLead3ElectricPotential(ElectricPotentialUnit::mV);
   m_Controls->ArterialPressure_mmHg = pulse.GetCardiovascularSystem()->GetArterialPressure(PressureUnit::mmHg);
   m_Controls->DiastolicPressure_mmHg = pulse.GetCardiovascularSystem()->GetDiastolicArterialPressure(PressureUnit::mmHg);
   m_Controls->SystolicPressure_mmHg = pulse.GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg);
@@ -66,11 +70,13 @@ void VitalsMonitorWidget::UpdateUI()
 
 void VitalsMonitorWidget::PulseUpdate()
 {
+  // This is where we take the pulse data we pulled and push it to a UI widget
   if (++m_Controls->Count == 50)
   {
     m_Controls->Count = 0;
     m_Controls->Mutex.lock();
     m_Controls->LogBox.append(QString("Heart Rate : %1 bpm").arg(m_Controls->HeartRate_bpm));
+    m_Controls->LogBox.append(QString("ECG III : %1 mV").arg(m_Controls->ECG_III_mV));
     m_Controls->LogBox.append(QString("Arterial Pressure : %1 mmHg").arg(m_Controls->ArterialPressure_mmHg));
     m_Controls->LogBox.append(QString("Diastolic Pressure : %1 mmHg").arg(m_Controls->DiastolicPressure_mmHg));
     m_Controls->LogBox.append(QString("Systolic Pressure : %1 mmHg").arg(m_Controls->SystolicPressure_mmHg));

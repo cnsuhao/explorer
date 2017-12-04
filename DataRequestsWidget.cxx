@@ -117,6 +117,7 @@ void DataRequestsWidget::UpdateUI()
 
 void DataRequestsWidget::PulseUpdate()
 {
+  // This is where we take the pulse data we pulled and push it to a UI widget
   if (++m_Controls->Count == 50)
   {
     m_Controls->Count = 0;
