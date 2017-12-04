@@ -16,6 +16,14 @@ public:
   ExplorerIntroWidget(QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
   virtual ~ExplorerIntroWidget();
 
+  QString GetShowcase();
+
+signals:
+  void StartSelectedShowcase();
+protected slots:
+  void UpdateUI();
+  void ReadSelectedShowcase();
+
 private:
   class Controls;
   Controls* m_Controls;

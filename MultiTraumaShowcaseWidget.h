@@ -5,18 +5,18 @@ See accompanying NOTICE file for details.*/
 #include <QObject>
 #include <QDockWidget>
 #include "QPulse.h"
-#include "cdm/scenario/SEDataRequest.h"
+
 
 namespace Ui {
-  class AnaphylaxisShowcaseWidget;
+  class MultiTraumaShowcaseWidget;
 }
 
-class AnaphylaxisShowcaseWidget : public QDockWidget, public PulseListener
+class MultiTraumaShowcaseWidget : public QDockWidget, public PulseListener
 {
   Q_OBJECT
 public:
-  AnaphylaxisShowcaseWidget(QTextEdit& log, QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
-  virtual ~AnaphylaxisShowcaseWidget();
+  MultiTraumaShowcaseWidget(QTextEdit& log, QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
+  virtual ~MultiTraumaShowcaseWidget();
 
   void ConfigurePulse(PhysiologyEngine& pulse, SEDataRequestManager& drMgr);
   void ProcessPhysiology(PhysiologyEngine& pulse);
@@ -27,12 +27,16 @@ signals:
 protected slots:
   void UpdateUI();
   void PulseUpdate();
-  void ApplyAirwayObstruction();
-  void InjectEpinephrine();
+  void ApplyHemorrhage();
+  void ApplyPnumothorax();
+  void ApplyPressure();
+  void ApplyNeedleDecompression();
+  void ApplyTourniquet();
+  void InfuseSaline();
+  void InjectMorphine();
 
 private:
   class Controls;
   Controls* m_Controls;
-  std::vector<SEDataRequest*> m_DataRequests;
 
 };

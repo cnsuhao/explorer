@@ -36,8 +36,10 @@
 #include "GeometryView.h"
 #include "ExplorerIntroWidget.h"
 #include "AnaphylaxisShowcaseWidget.h"
+#include "MultiTraumaShowcaseWidget.h"
 #include "DataRequestsWidget.h"
 #include "VitalsMonitorWidget.h"
+#include "cdm/scenario/SEDataRequestManager.h"
 #include "cdm/properties/SEScalarTime.h"
 
 
@@ -47,14 +49,13 @@ public:
 
   virtual ~Controls()
   {
-    // TODO how does Qt memory management work?
-    /*delete Pulse;
+    delete Pulse;
     delete GeometryView;
     delete MainView;
     delete ExplorerIntroWidget;
     delete AnaphylaxisShowcaseWidget;
-    delete VitalsMonitor;
-    delete DataRequests;*/
+    delete VitalsMonitorWidget;
+    delete DataRequestsWidget;
   }
 
 
@@ -64,8 +65,9 @@ public:
   pqRenderView*                     MainView;
   ExplorerIntroWidget*              ExplorerIntroWidget;
   AnaphylaxisShowcaseWidget*        AnaphylaxisShowcaseWidget;
-  VitalsMonitorWidget*              VitalsMonitor;
-  DataRequestsWidget*               DataRequests;
+  MultiTraumaShowcaseWidget*        MultiTraumaShowcaseWidget;
+  VitalsMonitorWidget*              VitalsMonitorWidget;
+  DataRequestsWidget*               DataRequestsWidget;
   std::stringstream                 Status;
   double                            CurrentSimTime_s;
 };
@@ -93,6 +95,7 @@ MainExplorerWindow::MainExplorerWindow()
   m_Controls->OutputWidget->show();
   m_Controls->OutputWidget->raise();
   m_Controls->OutputWidget->setVisible(true);
+  m_Controls->LogBox->setFontPointSize(10);
   
   m_Controls->Thread = new QThread(parent());
   m_Controls->Pulse = new QPulse(*m_Controls->Thread, *m_Controls->LogBox);
@@ -103,10 +106,13 @@ MainExplorerWindow::MainExplorerWindow()
   m_Controls->ExplorerIntroWidget = new ExplorerIntroWidget(this);
   m_Controls->InputWidget->layout()->addWidget(m_Controls->ExplorerIntroWidget);
 
-  // Add the Intro Widget to the Main control area
   m_Controls->AnaphylaxisShowcaseWidget = new AnaphylaxisShowcaseWidget(*m_Controls->LogBox, this);
   m_Controls->InputWidget->layout()->addWidget(m_Controls->AnaphylaxisShowcaseWidget);
   m_Controls->AnaphylaxisShowcaseWidget->setVisible(false);
+
+  m_Controls->MultiTraumaShowcaseWidget = new MultiTraumaShowcaseWidget(*m_Controls->LogBox, this);
+  m_Controls->InputWidget->layout()->addWidget(m_Controls->MultiTraumaShowcaseWidget);
+  m_Controls->MultiTraumaShowcaseWidget->setVisible(false);
 
   // Add ParaView view to the tabWidget
   m_Controls->MainView =
@@ -116,12 +122,12 @@ MainExplorerWindow::MainExplorerWindow()
   m_Controls->GeometryView->LoadGeometry();
   this->setCentralWidget(m_Controls->TabWidget);
   m_Controls->TabWidget->addTab(m_Controls->MainView->widget(), "ParaView");
-  m_Controls->VitalsMonitor = new VitalsMonitorWidget(*m_Controls->LogBox, this);
-  m_Controls->Pulse->RegisterListener(m_Controls->VitalsMonitor);
-  m_Controls->TabWidget->addTab(m_Controls->VitalsMonitor, "Vitals Monitor");
-  m_Controls->DataRequests = new DataRequestsWidget(*m_Controls->LogBox, this);
-  m_Controls->Pulse->RegisterListener(m_Controls->DataRequests);
-  m_Controls->TabWidget->addTab(m_Controls->DataRequests, "Data Requests");
+  m_Controls->VitalsMonitorWidget = new VitalsMonitorWidget(*m_Controls->LogBox, this);
+  m_Controls->Pulse->RegisterListener(m_Controls->VitalsMonitorWidget);
+  m_Controls->TabWidget->addTab(m_Controls->VitalsMonitorWidget, "Vitals Monitor");
+  m_Controls->DataRequestsWidget = new DataRequestsWidget(*m_Controls->LogBox, this);
+  m_Controls->Pulse->RegisterListener(m_Controls->DataRequestsWidget);
+  m_Controls->TabWidget->addTab(m_Controls->DataRequestsWidget, "Data Requests");
 
   m_Controls->PlayPauseButton->setVisible(false);
   m_Controls->ResetExplorer->setVisible(false);
@@ -185,18 +191,28 @@ void MainExplorerWindow::ResetShowcase()
   m_Controls->Pulse->Reset();
   m_Controls->PlayPauseButton->setText("Pause");
   m_Controls->LogBox->clear();
-  StartAnaphylaxisShowcase();
+  StartShowcase();
 }
 
-void MainExplorerWindow::StartAnaphylaxisShowcase()
+void MainExplorerWindow::StartShowcase()
 {
-  m_Controls->LogBox->append("Building Geometry");
   m_Controls->ExplorerIntroWidget->setVisible(false);
   m_Controls->PlayPauseButton->setVisible(true);
   m_Controls->ResetExplorer->setVisible(true);
   m_Controls->ResetShowcaseButton->setVisible(true);
-  m_Controls->AnaphylaxisShowcaseWidget->setVisible(true);
-  m_Controls->AnaphylaxisShowcaseWidget->ConfigurePulse(m_Controls->Pulse->GetEngine());
+  QString showcase = m_Controls->ExplorerIntroWidget->GetShowcase();
+  m_Controls->Pulse->GetEngineTracker().Clear();
+  if(showcase == "Anaphylaxis")
+  {
+    m_Controls->AnaphylaxisShowcaseWidget->setVisible(true);
+    m_Controls->AnaphylaxisShowcaseWidget->ConfigurePulse(m_Controls->Pulse->GetEngine(),m_Controls->Pulse->GetEngineTracker().GetDataRequestManager());
+  }
+  else if(showcase == "MultiTrauma")
+  {
+    m_Controls->MultiTraumaShowcaseWidget->setVisible(true);
+    m_Controls->MultiTraumaShowcaseWidget->ConfigurePulse(m_Controls->Pulse->GetEngine(), m_Controls->Pulse->GetEngineTracker().GetDataRequestManager());
+  }
+  m_Controls->DataRequestsWidget->BuildGraphs(m_Controls->Pulse->GetEngine());
   m_Controls->Pulse->Start();
   emit UIChanged();
 }

@@ -12,7 +12,6 @@ project(${project_name})
 
 set(${project_name}_CMAKE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(ParaView_DIR ${CMAKE_INSTALL_PREFIX}/../ParaView-build)
 find_package(ParaView REQUIRED)
 if (NOT PARAVIEW_BUILD_QT_GUI)
 	status(FATAL_ERROR "${project_name} requires ParaView to be built with Qt")
@@ -48,6 +47,7 @@ set(moc_sources
   VitalsMonitorWidget.h
   DataRequestsWidget.h
   AnaphylaxisShowcaseWidget.h
+  MultiTraumaShowcaseWidget.h
 )
 
 #------------------------------------------------------------------------------
@@ -58,17 +58,18 @@ IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   QT5_WRAP_UI(UI_BUILT_SOURCES
     MainExplorerWindow.ui 
     ExplorerIntro.ui 
-    AnaphylaxisShowcase.ui)
+    AnaphylaxisShowcase.ui
+    MultiTraumaShowcase.ui)
 ELSE ()
   QT4_WRAP_CPP(MOC_BUILT_SOURCES
     ${moc_sources})
   QT4_WRAP_UI(UI_BUILT_SOURCES
     MainExplorerWindow.ui 
     ExplorerIntro.ui 
-    AnaphylaxisShowcase.ui)
+    AnaphylaxisShowcase.ui
+    MultiTraumaShowcase.ui)
 ENDIF ()
 
-set(Pulse_DIR ${CMAKE_INSTALL_PREFIX}/../install)
 find_package(Pulse REQUIRED)
 
 SOURCE_GROUP("Generated" FILES
@@ -93,6 +94,8 @@ SET(${project_name}_SOURCE_FILES
   ExplorerIntroWidget.h
   AnaphylaxisShowcaseWidget.cxx
   AnaphylaxisShowcaseWidget.h
+  MultiTraumaShowcaseWidget.cxx
+  MultiTraumaShowcaseWidget.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 

@@ -51,7 +51,7 @@ public:
   }
   virtual ~Controls()
   {
-
+   
   }
 
   std::unique_ptr<PhysiologyEngine> Pulse;
@@ -79,6 +79,11 @@ QPulse::~QPulse()
 PhysiologyEngine& QPulse::GetEngine()
 {
   return *m_Controls->Pulse;
+}
+
+SEEngineTracker& QPulse::GetEngineTracker()
+{
+  return *m_Controls->Pulse->GetEngineTracker();
 }
 
 void QPulse::Start()

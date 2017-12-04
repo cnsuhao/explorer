@@ -4,6 +4,8 @@ See accompanying NOTICE file for details.*/
 
 #include "cdm/CommonDataModel.h"
 #include "PulsePhysiologyEngine.h"
+#include "cdm/scenario/SEDataRequestManager.h"
+#include "cdm/engine/SEEngineTracker.h"
 
 #include <QObject>
 #include <QTextEdit>
@@ -24,6 +26,7 @@ public:
 
 public:
   PhysiologyEngine& GetEngine();
+  SEEngineTracker& GetEngineTracker();
 
   void Reset();
   void Start();

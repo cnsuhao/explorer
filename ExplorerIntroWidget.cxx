@@ -6,7 +6,7 @@
 class ExplorerIntroWidget::Controls : public Ui::ExplorerIntroWidget
 {
 public:
-  
+  QString Showcase = "";
 };
 
 ExplorerIntroWidget::ExplorerIntroWidget(QWidget *parent, Qt::WindowFlags flags) : QDockWidget(parent,flags)
@@ -33,10 +33,28 @@ ExplorerIntroWidget::ExplorerIntroWidget(QWidget *parent, Qt::WindowFlags flags)
   m_Controls->LoadScenarioButton->setEnabled(false);
 
   connect(this,SIGNAL(dataChanged()), this, SLOT(updateUI()));
-  connect(m_Controls->LoadShowcase, SIGNAL(clicked()), parentWidget(),SLOT(StartAnaphylaxisShowcase()));
+  connect(m_Controls->LoadShowcase, SIGNAL(clicked()), this,SLOT(ReadSelectedShowcase()));
+  connect(this, SIGNAL(StartSelectedShowcase()), parentWidget(), SLOT(StartShowcase()));
 }
 
 ExplorerIntroWidget::~ExplorerIntroWidget()
 {
   delete m_Controls;
+}
+
+
+void ExplorerIntroWidget::UpdateUI()
+{
+
+}
+
+void ExplorerIntroWidget::ReadSelectedShowcase()
+{
+  m_Controls->Showcase = m_Controls->ShowcaseComboBox->currentText();
+  emit StartSelectedShowcase();
+}
+
+QString ExplorerIntroWidget::GetShowcase()
+{
+  return m_Controls->Showcase;
 }

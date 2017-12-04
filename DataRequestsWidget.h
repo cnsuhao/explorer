@@ -14,6 +14,7 @@ public:
   virtual ~DataRequestsWidget();
 
   void Reset();
+  void BuildGraphs(PhysiologyEngine& pulse);
   void ProcessPhysiology(PhysiologyEngine& pulse);
 
 signals:

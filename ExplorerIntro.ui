@@ -35,9 +35,17 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QComboBox" name="ShowcaseComboBox">
+          <property name="toolTipDuration">
+           <number>-4</number>
+          </property>
           <item>
            <property name="text">
             <string>Anaphylaxis</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>MultiTrauma</string>
            </property>
           </item>
          </widget>

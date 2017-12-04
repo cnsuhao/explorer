@@ -26,7 +26,6 @@ AnaphylaxisShowcaseWidget::AnaphylaxisShowcaseWidget(QTextEdit& log, QWidget *pa
 {
   m_Controls = new Controls(log);
   m_Controls->setupUi(this);
-  m_Controls->EpiButton->setEnabled(false);
 
   connect(this, SIGNAL(UIChanged()), this, SLOT(UpdateUI()));
   connect(this, SIGNAL(PulseChanged()), this, SLOT(PulseUpdate()));
@@ -41,10 +40,21 @@ AnaphylaxisShowcaseWidget::~AnaphylaxisShowcaseWidget()
   delete m_Controls;
 }
 
-void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse)
+void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRequestManager& drMgr)
 {
+  m_Controls->SeveritySlider->setEnabled(true);
+  m_Controls->ObsButton->setEnabled(true);
+  m_Controls->EpiButton->setEnabled(false);
+
   pulse.LoadStateFile("states/StandardMale@0s.pba");
-  m_Controls->LogBox.append("Starting Anaphylaxis Showcase Scenario");
+  m_Controls->LogBox.append("Anaphylaxis is a serious, potentially life threatening allergic reaction with facial and airway swelling.");
+  m_Controls->LogBox.append("It is an immune response that can occur quickly in response to exposure to an allergen.");
+  m_Controls->LogBox.append("The immune system releases chemicals into the body that cause the blood pressure to drop and the airways to narrow, blocking breathing.");
+  m_Controls->LogBox.append("Anaphylaxis is treated with an injection of epinephrine.");
+  m_Controls->LogBox.append("The anaphylaxis is rapidly reversed by the drug, allowing patient vital signs to return to normal.");
+  // FIll out any data requsts that we want to have plotted
+  const SESubstance* Epinephrine = pulse.GetSubstanceManager().GetSubstance("Epinephrine");
+  drMgr.CreateSubstanceDataRequest(*Epinephrine,"PlasmaConcentration",MassPerVolumeUnit::mg_Per_mL);
 }
 
 void AnaphylaxisShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)

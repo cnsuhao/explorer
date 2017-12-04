@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MultiTraumaShowcaseWidget</class>
+ <widget class="QDockWidget" name="MultiTraumaShowcaseWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>215</width>
+    <height>488</height>
+   </rect>
+  </property>
+  <property name="toolTip">
+   <string>Pnumothorax Type</string>
+  </property>
+  <property name="windowTitle">
+   <string>DockWidget</string>
+  </property>
+  <widget class="QWidget" name="MultiTraumaShowcase">
+   <widget class="QGroupBox" name="PnumothoraxGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>122</y>
+      <width>191</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Closed Pnumothorax</string>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="SeverityGroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Severity</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="pqDoubleRangeWidget" name="SeveritySlider" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum" stdset="0">
+           <number>1</number>
+          </property>
+          <property name="minimum" stdset="0">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ApplyPnumoButton">
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QComboBox" name="PnumothoraxTypeCombo">
+       <property name="currentText">
+        <string>Left</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>Left</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Right</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="ApplyPressureButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>310</y>
+      <width>191</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply Pressure</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NeedleDecompressButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>340</y>
+      <width>191</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Needle Decompression</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ApplyTournyButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>370</y>
+      <width>191</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply Tourniquet</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="InfuseSalineButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>191</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Infuse Saline</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="InjectMorphineButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>430</y>
+      <width>191</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Inject Morphine</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="HemorrhageGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>3</y>
+      <width>191</width>
+      <height>117</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Hemorrhage</string>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="FlowRateGroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Flow Rate</string>
+       </property>
+       <widget class="QPushButton" name="ApplyHemorrhageButton">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>141</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Apply</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="FlowRateUnit">
+        <property name="geometry">
+         <rect>
+          <x>109</x>
+          <y>26</y>
+          <width>40</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>mL / min</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="FlowRateEdit">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>24</y>
+          <width>88</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>350</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

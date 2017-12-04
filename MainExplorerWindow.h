@@ -30,7 +30,7 @@ protected slots:
   void PlayPause();
   void ResetExplorer();
   void ResetShowcase();
-  void StartAnaphylaxisShowcase();
+  void StartShowcase();
 
 private:
   class Controls;
