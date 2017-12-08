@@ -171,6 +171,7 @@ void MainExplorerWindow::PlayPause()
     m_Controls->PlayPauseButton->setText("Play");
   else
     m_Controls->PlayPauseButton->setText("Pause");
+  emit UIChanged();
 }
 
 void MainExplorerWindow::ResetExplorer()
@@ -184,6 +185,10 @@ void MainExplorerWindow::ResetExplorer()
   m_Controls->ResetExplorer->setVisible(false);
   m_Controls->ResetShowcaseButton->setVisible(false);
   m_Controls->AnaphylaxisShowcaseWidget->setVisible(false);
+  m_Controls->MultiTraumaShowcaseWidget->setVisible(false);
+  m_Controls->Pulse->RemoveListener(m_Controls->AnaphylaxisShowcaseWidget);
+  m_Controls->Pulse->RemoveListener(m_Controls->MultiTraumaShowcaseWidget);
+  emit UIChanged();
 }
 
 void MainExplorerWindow::ResetShowcase()
@@ -191,7 +196,10 @@ void MainExplorerWindow::ResetShowcase()
   m_Controls->Pulse->Reset();
   m_Controls->PlayPauseButton->setText("Pause");
   m_Controls->LogBox->clear();
+  m_Controls->Pulse->RemoveListener(m_Controls->AnaphylaxisShowcaseWidget);
+  m_Controls->Pulse->RemoveListener(m_Controls->MultiTraumaShowcaseWidget);
   StartShowcase();
+  emit UIChanged();
 }
 
 void MainExplorerWindow::StartShowcase()
@@ -206,11 +214,13 @@ void MainExplorerWindow::StartShowcase()
   {
     m_Controls->AnaphylaxisShowcaseWidget->setVisible(true);
     m_Controls->AnaphylaxisShowcaseWidget->ConfigurePulse(m_Controls->Pulse->GetEngine(),m_Controls->Pulse->GetEngineTracker().GetDataRequestManager());
+    m_Controls->Pulse->RegisterListener(m_Controls->AnaphylaxisShowcaseWidget);
   }
   else if(showcase == "MultiTrauma")
   {
     m_Controls->MultiTraumaShowcaseWidget->setVisible(true);
     m_Controls->MultiTraumaShowcaseWidget->ConfigurePulse(m_Controls->Pulse->GetEngine(), m_Controls->Pulse->GetEngineTracker().GetDataRequestManager());
+    m_Controls->Pulse->RegisterListener(m_Controls->MultiTraumaShowcaseWidget);
   }
   m_Controls->DataRequestsWidget->BuildGraphs(m_Controls->Pulse->GetEngine());
   m_Controls->Pulse->Start();

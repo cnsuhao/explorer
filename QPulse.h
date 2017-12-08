@@ -33,6 +33,7 @@ public:
   void Stop();
   bool PlayPause();//return true=paused
   void RegisterListener(PulseListener* listener);
+  void RemoveListener(PulseListener* listener);
   void AdvanceTime();
 
 protected:

@@ -34,7 +34,7 @@ if(NOT ParaView_FOUND)
   ExternalProject_Add(ParaView
     PREFIX ParaView
     GIT_REPOSITORY https://gitlab.kitware.com/paraview/paraview.git
-    GIT_TAG v5.2.0
+    GIT_TAG v5.4.1
     GIT_SHALLOW 1
     BINARY_DIR ${CMAKE_BINARY_DIR}/ParaView-build
     INSTALL_DIR ${CMAKE_BINARY_DIR}/install
@@ -75,7 +75,7 @@ if(NOT Pulse_FOUND)
   ExternalProject_Add(Pulse
     PREFIX Pulse
     GIT_REPOSITORY https://gitlab.kitware.com/physiology/engine.git
-    GIT_TAG v1.0
+    GIT_TAG 5b179b3ed9e4135202e7b32ff0e13ee3e0d5f30d
     GIT_SHALLOW 1
     BINARY_DIR ${CMAKE_BINARY_DIR}/Pulse-build
     INSTALL_DIR ${CMAKE_BINARY_DIR}/install

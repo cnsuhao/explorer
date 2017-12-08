@@ -128,8 +128,18 @@ void QPulse::Stop()
 
 void QPulse::RegisterListener(PulseListener* l)
 {
-  if (l != nullptr)//TODO and ! in the listeners list
+  if (l == nullptr)
+    return;
+  auto itr = std::find(m_Controls->Listeners.begin(), m_Controls->Listeners.end(), l);
+  if (itr == m_Controls->Listeners.end())
     m_Controls->Listeners.push_back(l);
+}
+
+void QPulse::RemoveListener(PulseListener* l)
+{
+  auto itr = std::find(m_Controls->Listeners.begin(), m_Controls->Listeners.end(), l);
+  if (itr != m_Controls->Listeners.end())
+    m_Controls->Listeners.erase(itr);
 }
 
 void QPulse::AdvanceTime()

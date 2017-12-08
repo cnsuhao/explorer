@@ -43,47 +43,51 @@ void DataRequestsWidget::BuildGraphs(PhysiologyEngine& pulse)
   std::stringstream ss;
   SEDataRequestManager& drMgr = pulse.GetEngineTracker()->GetDataRequestManager();
   std::string title;
+  std::string unit;
   for (SEDataRequest* dr : drMgr.GetDataRequests())
   {
-    
+    if (dr->HasUnit())
+      unit = " (" + dr->GetUnit()->GetString() + ")";
+    else
+      unit = "";
     switch (dr->GetCategory())
     {
     case cdm::DataRequestData_eCategory_Patient:
-      title = "Patient " + dr->GetPropertyName() + " (" + dr->GetUnit()->GetString() + ")";
+      title = "Patient " + dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_Physiology:
-      title = dr->GetPropertyName() + "(" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_Environment:
-      title = dr->GetPropertyName() + " (" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_GasCompartment:
     case cdm::DataRequestData_eCategory_LiquidCompartment:
       if (dr->HasSubstanceName())
-        title = dr->GetCompartmentName() + " " + dr->GetSubstanceName() + " " + dr->GetPropertyName() + " " + " (" + dr->GetUnit()->GetString() + ")";
+        title = dr->GetCompartmentName() + " " + dr->GetSubstanceName() + " " + dr->GetPropertyName() + unit;
       else
-        title = dr->GetCompartmentName() + " " + dr->GetPropertyName() + " " + " (" + dr->GetUnit()->GetString() + ")";
+        title = dr->GetCompartmentName() + " " + dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_ThermalCompartment:
-      title = dr->GetCompartmentName() + " " + dr->GetPropertyName() + " " + " (" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetCompartmentName() + " " + dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_TissueCompartment:
-      title = dr->GetCompartmentName() + " " + dr->GetPropertyName() + " " + " (" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetCompartmentName() + " " + dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_Substance:
       if (dr->HasCompartmentName())
-        title = dr->GetSubstanceName() + " " + dr->GetCompartmentName() + " " + dr->GetPropertyName() + " " + " (" + dr->GetUnit()->GetString() + ")";
+        title = dr->GetSubstanceName() + " " + dr->GetCompartmentName() + " " + dr->GetPropertyName() + unit;
       else
-        title = dr->GetSubstanceName() + " " + dr->GetPropertyName() + " " + " (" + dr->GetUnit()->GetString() + ")";
+        title = dr->GetSubstanceName() + " " + dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_AnesthesiaMachine:
-      title = dr->GetPropertyName() + "(" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_ECG:
-      title = dr->GetPropertyName() + "(" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetPropertyName() + unit;
       break;
     case cdm::DataRequestData_eCategory_Inhaler:
-      title = dr->GetPropertyName() + "(" + dr->GetUnit()->GetString() + ")";
+      title = dr->GetPropertyName() + unit;
       break;
     }
     if (!pulse.GetEngineTracker()->TrackRequest(*dr))
@@ -105,7 +109,10 @@ void DataRequestsWidget::ProcessPhysiology(PhysiologyEngine& pulse)
   pulse.GetEngineTracker()->PullData();
   for (SEDataRequest* dr : pulse.GetEngineTracker()->GetDataRequestManager().GetDataRequests())
   {
-    m_Controls->Values[i++] = 0;//I need to check this into plulse-> pulse.GetEngineTracker()->GetScalar(*dr)->GetValue();
+    if(dr->HasUnit())
+      m_Controls->Values[i++] = pulse.GetEngineTracker()->GetScalar(*dr)->GetValue(*dr->GetUnit());
+    else
+      m_Controls->Values[i++] = pulse.GetEngineTracker()->GetScalar(*dr)->GetValue();
   }
   emit PulseChanged(); // Call this if you need to update the UI with data from pulse
 }

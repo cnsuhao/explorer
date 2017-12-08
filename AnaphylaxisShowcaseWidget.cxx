@@ -80,7 +80,7 @@ void AnaphylaxisShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
     pulse.ProcessAction(EpinephrineBolus);
     m_Controls->LogBox.append("Injecting a bolus of epinephrine");
   }
-  if (m_Controls->InjectEpinephrine)
+  if (m_Controls->ReduceAirwayObstruction)
   {
 
   }
