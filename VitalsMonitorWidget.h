@@ -3,10 +3,14 @@ See accompanying NOTICE file for details.*/
 #pragma once
 
 #include <QObject>
-#include <QWidget>
+#include <QDockWidget>
 #include "QPulse.h"
 
-class VitalsMonitorWidget : public QWidget, public PulseListener
+namespace Ui {
+  class VitalsMonitorWidget;
+}
+
+class VitalsMonitorWidget : public QDockWidget, public PulseListener
 {
   Q_OBJECT
 public:

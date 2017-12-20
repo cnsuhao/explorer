@@ -46,7 +46,8 @@ void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
   m_Controls->ObsButton->setEnabled(true);
   m_Controls->EpiButton->setEnabled(false);
 
-  pulse.LoadStateFile("states/StandardMale@0s.pba");
+  if (!pulse.LoadStateFile("states/StandardMale@0s.pba"))
+    throw CommonDataModelException("Unable to load state file");
   m_Controls->LogBox.append("Anaphylaxis is a serious, potentially life threatening allergic reaction with facial and airway swelling.");
   m_Controls->LogBox.append("It is an immune response that can occur quickly in response to exposure to an allergen.");
   m_Controls->LogBox.append("The immune system releases chemicals into the body that cause the blood pressure to drop and the airways to narrow, blocking breathing.");

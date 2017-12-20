@@ -56,8 +56,10 @@ IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   QT5_WRAP_CPP(MOC_BUILT_SOURCES
     ${moc_sources})
   QT5_WRAP_UI(UI_BUILT_SOURCES
-    MainExplorerWindow.ui 
-    ExplorerIntro.ui 
+    MainExplorerWindow.ui
+    ExplorerIntro.ui
+    VitalsMonitor.ui
+    DataRequests.ui
     AnaphylaxisShowcase.ui
     MultiTraumaShowcase.ui)
 ELSE ()
@@ -66,6 +68,8 @@ ELSE ()
   QT4_WRAP_UI(UI_BUILT_SOURCES
     MainExplorerWindow.ui 
     ExplorerIntro.ui 
+    VitalsMonitor.ui
+    DataRequests.ui
     AnaphylaxisShowcase.ui
     MultiTraumaShowcase.ui)
 ENDIF ()

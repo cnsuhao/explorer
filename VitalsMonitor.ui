@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VitalsMonitorWidget</class>
+ <widget class="QDockWidget" name="VitalsMonitorWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1072</width>
+    <height>715</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1070</width>
+    <height>715</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1072</width>
+    <height>715</height>
+   </size>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background: black; border: 2px solid white</string>
+  </property>
+  <property name="features">
+   <set>QDockWidget::NoDockWidgetFeatures</set>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">DockWidget</string>
+  </property>
+  <widget class="QWidget" name="VitalsMonitor">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>1072</width>
+     <height>693</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>1072</width>
+     <height>693</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: black; border: 2px solid white</string>
+   </property>
+   <widget class="QWidget" name="ECGDisplayWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>791</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="ECGDisplayLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: green; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>ECG III</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QWidget" name="ECGGraphWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>771</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: black; border: 2px solid black</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="ABPDisplayWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>230</y>
+      <width>791</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="ABPDisplayLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>61</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: red; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>ABP</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QWidget" name="ABPGraphWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>771</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: black; border: 2px solid </string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="etCO2DisplayWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>460</y>
+      <width>791</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="etCO2DisplayLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>61</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>CO&lt;sub&gt;2&lt;/sub&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QWidget" name="etCO2GraphWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>46</y>
+       <width>771</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: black; border: 2px solid </string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="HeartRateWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>0</y>
+      <width>281</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="HeartRateUnit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: green; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>hr / min</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="HeartRateMax">
+     <property name="geometry">
+      <rect>
+       <x>59</x>
+       <y>42</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>120</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="HeartRateMin">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>65</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>50</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="HeartRateValue">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>40</y>
+       <width>151</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 64pt;font-weight: bold; background-color: black; color: green; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="BloodPressureWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>130</y>
+      <width>281</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="BloodPressureValues">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>30</y>
+       <width>221</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 48pt;font-weight: bold; background-color: black; color: red; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>0/0</string>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="MeanBloodPressureValue">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>100</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 28pt;font-weight: bold; background-color: black; color: red; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>(0)</string>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::NoTextInteraction</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BloodPressureUnit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>5</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: red; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>mmHg</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SysMax">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>64</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>160</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SysLabel">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>45</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>SYS</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SysMin">
+     <property name="geometry">
+      <rect>
+       <x>13</x>
+       <y>83</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>90</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="SpO2Widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>290</y>
+      <width>281</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="SpO2Unit">
+     <property name="geometry">
+      <rect>
+       <x>6</x>
+       <y>3</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: cyan; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>SpO2         %</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SpO2Min">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>90</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SpO2Max">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>34</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>100</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SpO2Value">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>151</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 64pt;font-weight: bold; background-color: black; color: cyan; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="etCO2Widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>410</y>
+      <width>281</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="etCO2Max">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>39</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>50</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etCO2Min">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>60</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>30</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etCO2Label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>8</y>
+       <width>61</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>etCO&lt;sub&gt;2&lt;/sub&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etCO2Unit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>35</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 10pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>mmHg</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etCO2Value">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>12</y>
+       <width>101</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 52pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="TempeartureWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>590</y>
+      <width>281</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="TempeartureUnit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: green; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>T      °C</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TempeartureMax">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>30</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>39.0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TempeartureMin">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>56</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>36.0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TempeartureValue">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>16</y>
+       <width>181</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 52pt;font-weight: bold; background-color: black; color: green; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="RespiratoryRateWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>500</y>
+      <width>281</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: black; border: 2px solid white</string>
+    </property>
+    <widget class="QLabel" name="RespiratoryRateMax">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>39</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>30</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RespiratoryRateMin">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>60</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>8</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RespiratoryRateLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>8</y>
+       <width>61</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 14pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>awRR</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RespiratoryRateUnit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>35</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 10pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string> / min</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RespiratoryRateValue">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>12</y>
+       <width>151</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">* { font-family: Arial;font-style: normal;font-size: 52pt;font-weight: bold; background-color: black; color: yellow; border: 0px solid black}</string>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <zorder>etCO2Widget</zorder>
+   <zorder>ECGDisplayWidget</zorder>
+   <zorder>ABPDisplayWidget</zorder>
+   <zorder>etCO2DisplayWidget</zorder>
+   <zorder>HeartRateWidget</zorder>
+   <zorder>BloodPressureWidget</zorder>
+   <zorder>SpO2Widget</zorder>
+   <zorder>TempeartureWidget</zorder>
+   <zorder>RespiratoryRateWidget</zorder>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

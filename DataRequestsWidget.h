@@ -3,10 +3,14 @@ See accompanying NOTICE file for details.*/
 #pragma once
 
 #include <QObject>
-#include <QWidget>
+#include <QDockWidget>
 #include "QPulse.h"
 
-class DataRequestsWidget : public QWidget, public PulseListener
+namespace Ui {
+  class DataRequestsWidget;
+}
+
+class DataRequestsWidget : public QDockWidget, public PulseListener
 {
   Q_OBJECT
 public:

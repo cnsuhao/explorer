@@ -104,6 +104,7 @@ MainExplorerWindow::MainExplorerWindow()
 
   // Add the Intro Widget to the Main control area
   m_Controls->ExplorerIntroWidget = new ExplorerIntroWidget(this);
+  m_Controls->ExplorerIntroWidget->setTitleBarWidget(new QWidget());
   m_Controls->InputWidget->layout()->addWidget(m_Controls->ExplorerIntroWidget);
 
   m_Controls->AnaphylaxisShowcaseWidget = new AnaphylaxisShowcaseWidget(*m_Controls->LogBox, this);
@@ -121,13 +122,14 @@ MainExplorerWindow::MainExplorerWindow()
   m_Controls->GeometryView = new GeometryView(m_Controls->MainView, this);
   m_Controls->GeometryView->LoadGeometry();
   this->setCentralWidget(m_Controls->TabWidget);
-  m_Controls->TabWidget->addTab(m_Controls->MainView->widget(), "ParaView");
+  m_Controls->TabWidget->widget(0)->layout()->addWidget(m_Controls->MainView->widget());
   m_Controls->VitalsMonitorWidget = new VitalsMonitorWidget(*m_Controls->LogBox, this);
   m_Controls->Pulse->RegisterListener(m_Controls->VitalsMonitorWidget);
-  m_Controls->TabWidget->addTab(m_Controls->VitalsMonitorWidget, "Vitals Monitor");
+  m_Controls->TabWidget->widget(1)->layout()->addWidget(m_Controls->VitalsMonitorWidget);
   m_Controls->DataRequestsWidget = new DataRequestsWidget(*m_Controls->LogBox, this);
+  m_Controls->DataRequestsWidget->setTitleBarWidget(new QWidget());
   m_Controls->Pulse->RegisterListener(m_Controls->DataRequestsWidget);
-  m_Controls->TabWidget->addTab(m_Controls->DataRequestsWidget, "Data Requests");
+  m_Controls->TabWidget->widget(2)->layout()->addWidget(m_Controls->DataRequestsWidget);
 
   m_Controls->PlayPauseButton->setVisible(false);
   m_Controls->ResetExplorer->setVisible(false);

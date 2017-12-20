@@ -51,7 +51,6 @@ MultiTraumaShowcaseWidget::~MultiTraumaShowcaseWidget()
 
 void MultiTraumaShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRequestManager& drMgr)
 {
-
   m_Controls->ApplyHemorrhageButton->setEnabled(true);
   m_Controls->FlowRateEdit->setEnabled(true);
   m_Controls->ApplyPnumoButton->setEnabled(true);
@@ -63,7 +62,8 @@ void MultiTraumaShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
   m_Controls->InfuseSalineButton->setEnabled(false);
   m_Controls->InjectMorphineButton->setEnabled(false);
 
-  pulse.LoadStateFile("states/Soldier@0s.pba");
+  if(!pulse.LoadStateFile("states/Soldier@0s.pba"))
+    throw CommonDataModelException("Unable to load state file");
   m_Controls->LogBox.append("Combining the tension pneumothorax with the blood loss from the hemorrhage pushes and eventually exceeds the limits of the homeostatic control mechanisms.");
   // FIll out any data requsts that we want to have plotted
   drMgr.CreatePhysiologyDataRequest("BloodVolume",VolumeUnit::L);

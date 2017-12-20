@@ -10,6 +10,18 @@
     <height>488</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>215</width>
+    <height>38</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>215</width>
+    <height>524287</height>
+   </size>
+  </property>
   <property name="toolTip">
    <string>Pnumothorax Type</string>
   </property>

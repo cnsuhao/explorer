@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1206</width>
-    <height>901</height>
+    <height>905</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,21 +19,72 @@
      <rect>
       <x>0</x>
       <y>10</y>
-      <width>1291</width>
-      <height>821</height>
+      <width>1091</width>
+      <height>631</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>-1</number>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="ParaViewTab">
+     <attribute name="title">
+      <string>ParaView</string>
+     </attribute>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <layout class="QHBoxLayout" name="ParaViewLayout"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="VitalsMonitorTab">
+     <property name="styleSheet">
+      <string notr="true">background: black; border: 2px solid white</string>
+     </property>
+     <attribute name="title">
+      <string>Vitals Monitor</string>
+     </attribute>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="VitalsMonitorLayout"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="DataRequestsTab">
+     <property name="styleSheet">
+      <string notr="true">background: lightgrey</string>
+     </property>
+     <attribute name="title">
+      <string>Data Requests</string>
+     </attribute>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout"/>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
   <widget class="QDockWidget" name="InputWidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+    <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>215</width>
+     <height>649</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>215</width>
+     <height>524287</height>
+    </size>
    </property>
    <property name="features">
     <set>QDockWidget::DockWidgetMovable</set>
