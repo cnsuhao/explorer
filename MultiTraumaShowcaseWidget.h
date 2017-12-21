@@ -5,7 +5,7 @@ See accompanying NOTICE file for details.*/
 #include <QObject>
 #include <QDockWidget>
 #include "QPulse.h"
-
+#include "GeometryView.h"
 
 namespace Ui {
   class MultiTraumaShowcaseWidget;
@@ -15,7 +15,7 @@ class MultiTraumaShowcaseWidget : public QDockWidget, public PulseListener
 {
   Q_OBJECT
 public:
-  MultiTraumaShowcaseWidget(QTextEdit& log, QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
+  MultiTraumaShowcaseWidget(QPulse& qp, GeometryView& geometry, QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
   virtual ~MultiTraumaShowcaseWidget();
 
   void ConfigurePulse(PhysiologyEngine& pulse, SEDataRequestManager& drMgr);
@@ -28,7 +28,7 @@ protected slots:
   void UpdateUI();
   void PulseUpdate();
   void ApplyHemorrhage();
-  void ApplyPnumothorax();
+  void ApplyPneumothorax();
   void ApplyPressure();
   void ApplyNeedleDecompression();
   void ApplyTourniquet();

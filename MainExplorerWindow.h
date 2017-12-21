@@ -28,6 +28,7 @@ protected slots:
   void UpdateUI();
   void PulseUpdate();
   void PlayPause();
+  void RunInRealtime();
   void ResetExplorer();
   void ResetShowcase();
   void StartShowcase();

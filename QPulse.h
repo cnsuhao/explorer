@@ -28,13 +28,18 @@ public:
   PhysiologyEngine& GetEngine();
   SEEngineTracker& GetEngineTracker();
 
+  QTextEdit& GetLogBox();
+  void IgnoreAction(const std::string& name);
+
   void Reset();
   void Start();
-  void Stop();
+  void Stop(); 
+  bool ToggleRealtime();//return true=yes
   bool PlayPause();//return true=paused
   void RegisterListener(PulseListener* listener);
   void RemoveListener(PulseListener* listener);
   void AdvanceTime();
+  double GetTimeStep_s();
 
 protected:
 

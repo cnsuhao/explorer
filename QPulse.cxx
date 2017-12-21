@@ -31,13 +31,22 @@ class LoggerForward2Qt : public LoggerForward
 public:
   LoggerForward2Qt(QTextEdit& log) : ExplorerLog(log) {}
   virtual ~LoggerForward2Qt() {}
-  virtual void ForwardDebug(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); }
-  virtual void ForwardInfo(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); }
+  virtual void ForwardDebug(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); }
+  virtual void ForwardInfo(const std::string& msg, const std::string& origin)    
+  { 
+    for (std::string str : IgnoreActions)
+    {
+      if (msg.find(str) != str.npos)
+        return;
+    }
+    ExplorerLog.append(QString(msg.c_str())); 
+  }
   virtual void ForwardWarning(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); }
-  virtual void ForwardError(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); }
-  virtual void ForwardFatal(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); }
+  virtual void ForwardError(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); }
+  virtual void ForwardFatal(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); }
 
   QTextEdit& ExplorerLog;
+  std::vector<std::string> IgnoreActions;
 };
 
 class QPulse::Controls
@@ -60,6 +69,7 @@ public:
   TimingProfile                     Timer; 
   bool                              Running=false;
   bool                              Paused=false;
+  bool                              RunInRealtime=true;
   bool                              Advancing;
   double                            AdvanceStep_s=0.1;
   std::vector<PulseListener*>       Listeners;
@@ -76,6 +86,16 @@ QPulse::~QPulse()
   delete m_Controls;
 }
 
+QTextEdit& QPulse::GetLogBox()
+{
+  return m_Controls->Log2Qt.ExplorerLog;
+}
+
+void QPulse::IgnoreAction(const std::string& name)
+{
+  m_Controls->Log2Qt.IgnoreActions.push_back(name);
+}
+
 PhysiologyEngine& QPulse::GetEngine()
 {
   return *m_Controls->Pulse;
@@ -84,6 +104,11 @@ PhysiologyEngine& QPulse::GetEngine()
 SEEngineTracker& QPulse::GetEngineTracker()
 {
   return *m_Controls->Pulse->GetEngineTracker();
+}
+
+double QPulse::GetTimeStep_s()
+{
+  return m_Controls->AdvanceStep_s;
 }
 
 void QPulse::Start()
@@ -105,6 +130,8 @@ void QPulse::Reset()
   m_Controls->Running = false;
   m_Controls->Paused = false;
   m_Controls->Advancing = false;
+  m_Controls->RunInRealtime = true;
+  m_Controls->Log2Qt.IgnoreActions.clear();
 }
 
 bool QPulse::PlayPause()
@@ -112,6 +139,13 @@ bool QPulse::PlayPause()
   if (m_Controls->Thread.isRunning())
     m_Controls->Paused = !m_Controls->Paused;
   return m_Controls->Paused;
+}
+
+bool QPulse::ToggleRealtime()
+{
+  if (m_Controls->Thread.isRunning())
+    m_Controls->RunInRealtime = !m_Controls->RunInRealtime;
+  return m_Controls->RunInRealtime;
 }
 
 void QPulse::Stop()
@@ -144,7 +178,7 @@ void QPulse::RemoveListener(PulseListener* l)
 
 void QPulse::AdvanceTime()
 {
-  long long sleep_s;
+  long long sleep_ms;
   TimingProfile timer;
   m_Controls->Running = true;
   m_Controls->Advancing = true;
@@ -158,10 +192,11 @@ void QPulse::AdvanceTime()
     {
       timer.Start("r");
       m_Controls->Pulse->AdvanceModelTime(m_Controls->AdvanceStep_s, TimeUnit::s);
-      sleep_s = m_Controls->AdvanceStep_s - timer.GetElapsedTime_s("r");
       for (PulseListener* l : m_Controls->Listeners)
         l->ProcessPhysiology(*m_Controls->Pulse);
-      std::this_thread::sleep_for(std::chrono::seconds(sleep_s));// Wait for real time to catch up
+      sleep_ms = (long long)((m_Controls->AdvanceStep_s - timer.GetElapsedTime_s("r"))*1000);
+      if (m_Controls->RunInRealtime && sleep_ms > 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));// Wait for real time to catch up
     }
   }
   m_Controls->Advancing = false;

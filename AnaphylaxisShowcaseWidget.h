@@ -5,6 +5,7 @@ See accompanying NOTICE file for details.*/
 #include <QObject>
 #include <QDockWidget>
 #include "QPulse.h"
+#include "GeometryView.h"
 #include "cdm/scenario/SEDataRequest.h"
 
 namespace Ui {
@@ -15,7 +16,7 @@ class AnaphylaxisShowcaseWidget : public QDockWidget, public PulseListener
 {
   Q_OBJECT
 public:
-  AnaphylaxisShowcaseWidget(QTextEdit& log, QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
+  AnaphylaxisShowcaseWidget(QPulse& qp, GeometryView& geometry, QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
   virtual ~AnaphylaxisShowcaseWidget();
 
   void ConfigurePulse(PhysiologyEngine& pulse, SEDataRequestManager& drMgr);
@@ -24,6 +25,7 @@ public:
 signals:
   void UIChanged();
   void PulseChanged();
+  void GeometryChanged();
 protected slots:
   void UpdateUI();
   void PulseUpdate();

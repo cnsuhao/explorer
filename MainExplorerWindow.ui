@@ -111,6 +111,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QCheckBox" name="RunInRealtime">
+       <property name="text">
+        <string>Real-time Lock</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="PlayPauseButton">
        <property name="text">
         <string>Pause</string>

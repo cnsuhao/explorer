@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>215</width>
-    <height>488</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,7 +29,7 @@
    <string>DockWidget</string>
   </property>
   <widget class="QWidget" name="MultiTraumaShowcase">
-   <widget class="QGroupBox" name="PnumothoraxGroupBox">
+   <widget class="QGroupBox" name="PneumothoraxGroupBox">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -39,7 +39,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Closed Pnumothorax</string>
+     <string>Closed Pneumothorax</string>
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="1" column="0">
@@ -71,7 +71,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="ApplyPnumoButton">
+         <widget class="QPushButton" name="ApplyPneumoButton">
           <property name="text">
            <string>Apply</string>
           </property>
@@ -81,7 +81,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QComboBox" name="PnumothoraxTypeCombo">
+      <widget class="QComboBox" name="PneumothoraxTypeCombo">
        <property name="currentText">
         <string>Left</string>
        </property>

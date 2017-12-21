@@ -107,14 +107,6 @@ MainExplorerWindow::MainExplorerWindow()
   m_Controls->ExplorerIntroWidget->setTitleBarWidget(new QWidget());
   m_Controls->InputWidget->layout()->addWidget(m_Controls->ExplorerIntroWidget);
 
-  m_Controls->AnaphylaxisShowcaseWidget = new AnaphylaxisShowcaseWidget(*m_Controls->LogBox, this);
-  m_Controls->InputWidget->layout()->addWidget(m_Controls->AnaphylaxisShowcaseWidget);
-  m_Controls->AnaphylaxisShowcaseWidget->setVisible(false);
-
-  m_Controls->MultiTraumaShowcaseWidget = new MultiTraumaShowcaseWidget(*m_Controls->LogBox, this);
-  m_Controls->InputWidget->layout()->addWidget(m_Controls->MultiTraumaShowcaseWidget);
-  m_Controls->MultiTraumaShowcaseWidget->setVisible(false);
-
   // Add ParaView view to the tabWidget
   m_Controls->MainView =
       qobject_cast<pqRenderView*>(pqApplicationCore::instance()->getObjectBuilder()->createView(
@@ -131,12 +123,26 @@ MainExplorerWindow::MainExplorerWindow()
   m_Controls->Pulse->RegisterListener(m_Controls->DataRequestsWidget);
   m_Controls->TabWidget->widget(2)->layout()->addWidget(m_Controls->DataRequestsWidget);
 
+  m_Controls->RunInRealtime->setVisible(false);
   m_Controls->PlayPauseButton->setVisible(false);
   m_Controls->ResetExplorer->setVisible(false);
   m_Controls->ResetShowcaseButton->setVisible(false);
 
+  // Add Scenario Widgets
+
+  m_Controls->AnaphylaxisShowcaseWidget = new AnaphylaxisShowcaseWidget(*m_Controls->Pulse, *m_Controls->GeometryView, this);
+  m_Controls->AnaphylaxisShowcaseWidget->setTitleBarWidget(new QWidget());
+  m_Controls->InputWidget->layout()->addWidget(m_Controls->AnaphylaxisShowcaseWidget);
+  m_Controls->AnaphylaxisShowcaseWidget->setVisible(false);
+
+  m_Controls->MultiTraumaShowcaseWidget = new MultiTraumaShowcaseWidget(*m_Controls->Pulse, *m_Controls->GeometryView, this);
+  m_Controls->MultiTraumaShowcaseWidget->setTitleBarWidget(new QWidget());
+  m_Controls->InputWidget->layout()->addWidget(m_Controls->MultiTraumaShowcaseWidget);
+  m_Controls->MultiTraumaShowcaseWidget->setVisible(false);
+
   connect(this,SIGNAL(UIChanged()), this, SLOT(UpdateUI()));
   connect(this,SIGNAL(PulseChanged()), this, SLOT(PulseUpdate()));
+  connect(m_Controls->RunInRealtime, SIGNAL(clicked()), this, SLOT(RunInRealtime()));
   connect(m_Controls->PlayPauseButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
   connect(m_Controls->ResetExplorer, SIGNAL(clicked()), this, SLOT(ResetExplorer()));
   connect(m_Controls->ResetShowcaseButton, SIGNAL(clicked()), this, SLOT(ResetShowcase()));
@@ -176,6 +182,15 @@ void MainExplorerWindow::PlayPause()
   emit UIChanged();
 }
 
+void MainExplorerWindow::RunInRealtime()
+{
+  if (m_Controls->Pulse->ToggleRealtime())
+    m_Controls->RunInRealtime->setChecked(true);
+  else
+    m_Controls->RunInRealtime->setChecked(false);
+  emit UIChanged();
+}
+
 void MainExplorerWindow::ResetExplorer()
 {
   m_Controls->Pulse->Reset();
@@ -183,6 +198,7 @@ void MainExplorerWindow::ResetExplorer()
   m_Controls->LogBox->clear();
   m_Controls->Status << "Current Simulation Time : 0s";
   m_Controls->ExplorerIntroWidget->setVisible(true);
+  m_Controls->RunInRealtime->setVisible(false);
   m_Controls->PlayPauseButton->setVisible(false);
   m_Controls->ResetExplorer->setVisible(false);
   m_Controls->ResetShowcaseButton->setVisible(false);
@@ -196,8 +212,10 @@ void MainExplorerWindow::ResetExplorer()
 void MainExplorerWindow::ResetShowcase()
 {
   m_Controls->Pulse->Reset();
+  m_Controls->DataRequestsWidget->Reset();
+  m_Controls->RunInRealtime->setChecked(true);
   m_Controls->PlayPauseButton->setText("Pause");
-  m_Controls->LogBox->clear();
+  m_Controls->LogBox->clear();  
   m_Controls->Pulse->RemoveListener(m_Controls->AnaphylaxisShowcaseWidget);
   m_Controls->Pulse->RemoveListener(m_Controls->MultiTraumaShowcaseWidget);
   StartShowcase();
@@ -207,6 +225,7 @@ void MainExplorerWindow::ResetShowcase()
 void MainExplorerWindow::StartShowcase()
 {
   m_Controls->ExplorerIntroWidget->setVisible(false);
+  m_Controls->RunInRealtime->setVisible(true);
   m_Controls->PlayPauseButton->setVisible(true);
   m_Controls->ResetExplorer->setVisible(true);
   m_Controls->ResetShowcaseButton->setVisible(true);

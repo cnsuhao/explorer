@@ -16,7 +16,6 @@ public:
   QMutex                             Mutex;
   std::vector<std::string>           Graphs; // Instead of plots, just names for now
   std::vector<double>                Values; // New value for the plot
-  int                                Count = 0;//Just outputting data to the log every 5 seconds, take out when plots are working
 };
 
 DataRequestsWidget::DataRequestsWidget(QTextEdit& log, QWidget *parent, Qt::WindowFlags flags) : QDockWidget(parent,flags)
@@ -35,7 +34,7 @@ DataRequestsWidget::~DataRequestsWidget()
 
 void DataRequestsWidget::Reset()
 {
-  m_Controls->Count = 0;
+  m_Controls->DataRequested->clear();
 }
 
 void DataRequestsWidget::BuildGraphs(PhysiologyEngine& pulse)

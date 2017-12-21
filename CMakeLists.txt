@@ -110,26 +110,39 @@ INCLUDE_DIRECTORIES(
   )
 
 set(CMAKE_MODULE_PATH ${ParaView_CMAKE_DIR})
-include (${PARAVIEW_USE_FILE})
-# include rules for creating custom applications.
-include(ParaViewBranding)
+set(BRAND TRUE)
+if(BRAND)
+  include (${PARAVIEW_USE_FILE})
+  # include rules for creating custom applications.
+  include(ParaViewBranding)
+  build_paraview_client(${project_name}
+    TITLE "Pulse Physiology Explorer"
+    ORGANIZATION  "Kitware, Inc."
+    VERSION_MAJOR 0
+    VERSION_MINOR 1
+    VERSION_PATCH 0
+  #  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"
+    PVMAIN_WINDOW MainExplorerWindow
+    PVMAIN_WINDOW_INCLUDE MainExplorerWindow.h
+    EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering
+                       ${Pulse_LIBS}
+    SOURCES ${${project_name}_SOURCE_FILES}
+  )
+else()
+  include(ParaViewQt)
+  add_executable(${project_name} ${${project_name}_SOURCE_FILES})
+  target_include_directories(${project_name} PRIVATE ${Qt_INCLUDE_DIRS})
+  target_include_directories(${project_name} PRIVATE ${PARAVIEW_INCLUDE_DIRS})
+  target_include_directories(${project_name} PRIVATE ${Pulse_INCLUDE_DIRS})
+  target_link_libraries(${project_name} debug "${Pulse_DEBUG_LIBS}")
+  target_link_libraries(${project_name} optimized "${Pulse_LIBS}")  
+  target_link_libraries(${project_name} general ${Qt5Charts_LIBRARIES} ${PARAVIEW_LIBRARIES} 
+        pqApplicationComponents
+        vtkPVServerManagerApplication
+        vtksys vtkPVServerManagerRendering)
+endif()
 
-file(COPY data DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-
-build_paraview_client(${project_name}
-  TITLE "Pulse Physiology Explorer"
-  ORGANIZATION  "Kitware, Inc."
-  VERSION_MAJOR 0
-  VERSION_MINOR 1
-  VERSION_PATCH 0
-#  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"
-  PVMAIN_WINDOW MainExplorerWindow
-  PVMAIN_WINDOW_INCLUDE MainExplorerWindow.h
-  EXTRA_DEPENDENCIES ${Qt5Charts_LIBRARIES} vtkPVServerManagerRendering
-                     ${Pulse_LIBS}
-  SOURCES ${${project_name}_SOURCE_FILES}
-)
-
+file(COPY data DESTINATION ${Pulse_INSTALL}/bin)
 # Need to support debug still
 if(WIN32)
   set(postfix)#for debug builds this should be "d"
