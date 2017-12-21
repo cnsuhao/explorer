@@ -5,6 +5,7 @@
 #include "cdm/properties/SEScalar0To1.h"
 #include "cdm/properties/SEScalarVolume.h"
 #include "cdm/properties/SEScalarMassPerVolume.h"
+#include "cdm/properties/SEScalarVolumePerTime.h"
 #include "cdm/substance/SESubstance.h"
 #include "cdm/substance/SESubstanceManager.h"
 #include "cdm/patient/actions/SESubstanceBolus.h"
