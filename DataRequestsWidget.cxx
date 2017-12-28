@@ -132,11 +132,11 @@ void DataRequestsWidget::BuildGraphs(PhysiologyEngine& pulse)
 void DataRequestsWidget::ProcessPhysiology(PhysiologyEngine& pulse)
 {
   // This is where we pull data from pulse, and push any actions to it
+  m_Controls->Mutex.lock();
   size_t i = 0;
   QPulsePlot* plot;
   pulse.GetEngineTracker()->PullData();
   double  v;
-  m_Controls->Mutex.lock();
   for (SEDataRequest* dr : pulse.GetEngineTracker()->GetDataRequestManager().GetDataRequests())
   {
     plot = m_Controls->Plots[i++];

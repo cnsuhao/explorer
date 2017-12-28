@@ -17,6 +17,7 @@
 #include <QtCharts/QValueAxis>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QMutex>
 
 #include <pqActiveObjects.h>
 #include <pqAlwaysConnectedBehavior.h>
@@ -62,7 +63,7 @@ public:
     delete DataRequestsWidget;
   }
 
-
+  QMutex                            Mutex;
   QPulse*                           Pulse;
   QPointer<QThread>                 Thread;
   QPointer<GeometryView>            GeometryView;
@@ -254,14 +255,18 @@ void MainExplorerWindow::StartShowcase()
 
 void MainExplorerWindow::PulseUpdateUI()
 {
+  m_Controls->Mutex.lock();
   m_Controls->Status.str("");
   m_Controls->Status << "Current Simulation Time : " << m_Controls->CurrentSimTime_s << "s";
   m_Controls->StatusBar->showMessage(QString(m_Controls->Status.str().c_str()));
   m_Controls->MainView->render();
+  m_Controls->Mutex.unlock();
 }
 
 void MainExplorerWindow::ProcessPhysiology(PhysiologyEngine& pulse)
 {
+  m_Controls->Mutex.lock();
   // This is where we pull data from pulse, and push any actions to it
   m_Controls->CurrentSimTime_s = pulse.GetSimulationTime(TimeUnit::s);
+  m_Controls->Mutex.unlock();
 }

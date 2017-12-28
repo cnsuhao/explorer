@@ -162,6 +162,5 @@ void VitalsMonitorWidget::PulseUpdateUI()
     m_Controls->ECG_III_Plot->UpdateUI(false); 
     m_Controls->ArterialPressure_Plot->UpdateUI(false);
     m_Controls->etCO2_Plot->UpdateUI(false);
-   
     m_Controls->Mutex.unlock();
 }
