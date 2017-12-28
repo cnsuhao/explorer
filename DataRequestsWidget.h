@@ -21,12 +21,11 @@ public:
   void BuildGraphs(PhysiologyEngine& pulse);
   void ProcessPhysiology(PhysiologyEngine& pulse);
 
+  void PulseUpdateUI();// Main Window will call this to update UI Components
+
 signals:
-  void UIChanged();
-  void PulseChanged();
 protected slots:
-  void UpdateUI();
-  void PulseUpdate();
+  void ChangePlot(int);
 
 private:
   class Controls;

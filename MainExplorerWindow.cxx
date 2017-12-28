@@ -39,7 +39,11 @@
 #include "MultiTraumaShowcaseWidget.h"
 #include "DataRequestsWidget.h"
 #include "VitalsMonitorWidget.h"
+
+#include "cdm/CommonDataModel.h"
+#include "PulsePhysiologyEngine.h"
 #include "cdm/scenario/SEDataRequestManager.h"
+#include "cdm/engine/SEEngineTracker.h"
 #include "cdm/properties/SEScalarTime.h"
 
 
@@ -113,6 +117,7 @@ MainExplorerWindow::MainExplorerWindow()
                                   pqRenderView::renderViewType(),pqActiveObjects::instance().activeServer()));
   m_Controls->GeometryView = new GeometryView(m_Controls->MainView, this);
   m_Controls->GeometryView->LoadGeometry();
+  m_Controls->Pulse->RegisterListener(m_Controls->GeometryView);
   this->setCentralWidget(m_Controls->TabWidget);
   m_Controls->TabWidget->widget(0)->layout()->addWidget(m_Controls->MainView->widget());
   m_Controls->VitalsMonitorWidget = new VitalsMonitorWidget(*m_Controls->LogBox, this);
@@ -130,23 +135,21 @@ MainExplorerWindow::MainExplorerWindow()
 
   // Add Scenario Widgets
 
-  m_Controls->AnaphylaxisShowcaseWidget = new AnaphylaxisShowcaseWidget(*m_Controls->Pulse, *m_Controls->GeometryView, this);
+  m_Controls->AnaphylaxisShowcaseWidget = new AnaphylaxisShowcaseWidget(*m_Controls->Pulse, this);
   m_Controls->AnaphylaxisShowcaseWidget->setTitleBarWidget(new QWidget());
   m_Controls->InputWidget->layout()->addWidget(m_Controls->AnaphylaxisShowcaseWidget);
   m_Controls->AnaphylaxisShowcaseWidget->setVisible(false);
 
-  m_Controls->MultiTraumaShowcaseWidget = new MultiTraumaShowcaseWidget(*m_Controls->Pulse, *m_Controls->GeometryView, this);
+  m_Controls->MultiTraumaShowcaseWidget = new MultiTraumaShowcaseWidget(*m_Controls->Pulse,  this);
   m_Controls->MultiTraumaShowcaseWidget->setTitleBarWidget(new QWidget());
   m_Controls->InputWidget->layout()->addWidget(m_Controls->MultiTraumaShowcaseWidget);
   m_Controls->MultiTraumaShowcaseWidget->setVisible(false);
 
-  connect(this,SIGNAL(UIChanged()), this, SLOT(UpdateUI()));
   connect(this,SIGNAL(PulseChanged()), this, SLOT(PulseUpdate()));
   connect(m_Controls->RunInRealtime, SIGNAL(clicked()), this, SLOT(RunInRealtime()));
   connect(m_Controls->PlayPauseButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
   connect(m_Controls->ResetExplorer, SIGNAL(clicked()), this, SLOT(ResetExplorer()));
   connect(m_Controls->ResetShowcaseButton, SIGNAL(clicked()), this, SLOT(ResetShowcase()));
-  emit UIChanged();
 }
 
 MainExplorerWindow::~MainExplorerWindow()
@@ -179,7 +182,6 @@ void MainExplorerWindow::PlayPause()
     m_Controls->PlayPauseButton->setText("Play");
   else
     m_Controls->PlayPauseButton->setText("Pause");
-  emit UIChanged();
 }
 
 void MainExplorerWindow::RunInRealtime()
@@ -188,12 +190,14 @@ void MainExplorerWindow::RunInRealtime()
     m_Controls->RunInRealtime->setChecked(true);
   else
     m_Controls->RunInRealtime->setChecked(false);
-  emit UIChanged();
 }
 
 void MainExplorerWindow::ResetExplorer()
 {
   m_Controls->Pulse->Reset();
+  m_Controls->DataRequestsWidget->Reset();
+  m_Controls->VitalsMonitorWidget->Reset();
+  m_Controls->RunInRealtime->setChecked(true);
   m_Controls->PlayPauseButton->setText("Pause");
   m_Controls->LogBox->clear();
   m_Controls->Status << "Current Simulation Time : 0s";
@@ -206,20 +210,20 @@ void MainExplorerWindow::ResetExplorer()
   m_Controls->MultiTraumaShowcaseWidget->setVisible(false);
   m_Controls->Pulse->RemoveListener(m_Controls->AnaphylaxisShowcaseWidget);
   m_Controls->Pulse->RemoveListener(m_Controls->MultiTraumaShowcaseWidget);
-  emit UIChanged();
 }
 
 void MainExplorerWindow::ResetShowcase()
 {
   m_Controls->Pulse->Reset();
+  m_Controls->GeometryView->Reset();
   m_Controls->DataRequestsWidget->Reset();
+  m_Controls->VitalsMonitorWidget->Reset();
   m_Controls->RunInRealtime->setChecked(true);
   m_Controls->PlayPauseButton->setText("Pause");
   m_Controls->LogBox->clear();  
   m_Controls->Pulse->RemoveListener(m_Controls->AnaphylaxisShowcaseWidget);
   m_Controls->Pulse->RemoveListener(m_Controls->MultiTraumaShowcaseWidget);
   StartShowcase();
-  emit UIChanged();
 }
 
 void MainExplorerWindow::StartShowcase()
@@ -233,6 +237,7 @@ void MainExplorerWindow::StartShowcase()
   m_Controls->Pulse->GetEngineTracker().Clear();
   if(showcase == "Anaphylaxis")
   {
+    m_Controls->GeometryView->RenderSpO2(true);
     m_Controls->AnaphylaxisShowcaseWidget->setVisible(true);
     m_Controls->AnaphylaxisShowcaseWidget->ConfigurePulse(m_Controls->Pulse->GetEngine(),m_Controls->Pulse->GetEngineTracker().GetDataRequestManager());
     m_Controls->Pulse->RegisterListener(m_Controls->AnaphylaxisShowcaseWidget);
@@ -245,24 +250,18 @@ void MainExplorerWindow::StartShowcase()
   }
   m_Controls->DataRequestsWidget->BuildGraphs(m_Controls->Pulse->GetEngine());
   m_Controls->Pulse->Start();
-  emit UIChanged();
 }
 
-void MainExplorerWindow::UpdateUI()
-{
-  m_Controls->MainView->render();
-}
-
-void MainExplorerWindow::PulseUpdate()
+void MainExplorerWindow::PulseUpdateUI()
 {
   m_Controls->Status.str("");
   m_Controls->Status << "Current Simulation Time : " << m_Controls->CurrentSimTime_s << "s";
   m_Controls->StatusBar->showMessage(QString(m_Controls->Status.str().c_str()));
+  m_Controls->MainView->render();
 }
 
 void MainExplorerWindow::ProcessPhysiology(PhysiologyEngine& pulse)
 {
   // This is where we pull data from pulse, and push any actions to it
   m_Controls->CurrentSimTime_s = pulse.GetSimulationTime(TimeUnit::s);
-  emit PulseChanged(); // Call this if you need to update the UI with data from pulse
 }

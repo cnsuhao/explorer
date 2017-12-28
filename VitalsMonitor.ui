@@ -12,7 +12,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1070</width>
+    <width>1072</width>
     <height>715</height>
    </size>
   </property>
@@ -87,15 +87,20 @@
     <widget class="QWidget" name="ECGGraphWidget" native="true">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>9</x>
        <y>50</y>
        <width>771</width>
-       <height>161</height>
+       <height>171</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">background: black; border: 2px solid black</string>
      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout"/>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="ABPDisplayWidget" native="true">
@@ -135,12 +140,17 @@
        <x>10</x>
        <y>50</y>
        <width>771</width>
-       <height>161</height>
+       <height>171</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">background: black; border: 2px solid </string>
      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="etCO2DisplayWidget" native="true">
@@ -180,12 +190,17 @@
        <x>10</x>
        <y>46</y>
        <width>771</width>
-       <height>161</height>
+       <height>181</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">background: black; border: 2px solid </string>
      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5"/>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="HeartRateWidget" native="true">
@@ -457,7 +472,7 @@
       <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
      </property>
      <property name="text">
-      <string>90</string>
+      <string>95</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -527,7 +542,7 @@
       <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
      </property>
      <property name="text">
-      <string>50</string>
+      <string>40</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -546,7 +561,7 @@
       <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
      </property>
      <property name="text">
-      <string>30</string>
+      <string>27</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -724,7 +739,7 @@
       <string notr="true">* { font-family: Arial;font-style: normal;font-size: 12pt;font-weight: bold; background-color: black; color: white; border: 0px solid black}</string>
      </property>
      <property name="text">
-      <string>30</string>
+      <string>20</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

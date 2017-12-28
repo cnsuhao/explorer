@@ -1,6 +1,11 @@
 #include "MultiTraumaShowcaseWidget.h"
 #include "ui_MultiTraumaShowcase.h"
 
+#include <QMutex>
+
+#include "cdm/CommonDataModel.h"
+#include "PulsePhysiologyEngine.h"
+#include "cdm/scenario/SEDataRequestManager.h"
 #include "cdm/properties/SEScalarTime.h"
 #include "cdm/properties/SEScalar0To1.h"
 #include "cdm/properties/SEScalarVolume.h"
@@ -17,8 +22,7 @@
 class MultiTraumaShowcaseWidget::Controls : public Ui::MultiTraumaShowcaseWidget
 {
 public:
-  Controls(QPulse& qp, GeometryView& g) : Pulse(qp), Geometry(g) {}
-  GeometryView&        Geometry;
+  Controls(QPulse& qp) : Pulse(qp) {}
   QPulse&              Pulse;
   double               HemorrhageRate_mL_Per_min=0;
   double               PneumothoraxSeverity = 0;
@@ -30,17 +34,15 @@ public:
   bool                 ApplyTourniquet = false;
   bool                 InfuseSaline = false;
   bool                 InjectMorphine = false;
+  QMutex               Mutex;
 };
 
-MultiTraumaShowcaseWidget::MultiTraumaShowcaseWidget(QPulse& qp, GeometryView& g, QWidget *parent, Qt::WindowFlags flags) : QDockWidget(parent,flags)
+MultiTraumaShowcaseWidget::MultiTraumaShowcaseWidget(QPulse& qp, QWidget *parent, Qt::WindowFlags flags) : QDockWidget(parent,flags)
 {
-  m_Controls = new Controls(qp,g);
+  m_Controls = new Controls(qp);
   m_Controls->setupUi(this);
 
   m_Controls->FlowRateEdit->setValidator(new QDoubleValidator(0, 500, 1, this));
-
-  connect(this, SIGNAL(UIChanged()), this, SLOT(UpdateUI()));
-  connect(this, SIGNAL(PulseChanged()), this, SLOT(PulseUpdate()));
 
   connect(m_Controls->ApplyHemorrhageButton, SIGNAL(clicked()), this, SLOT(ApplyHemorrhage()));
   connect(m_Controls->ApplyPneumoButton, SIGNAL(clicked()), this, SLOT(ApplyPneumothorax()));
@@ -49,7 +51,6 @@ MultiTraumaShowcaseWidget::MultiTraumaShowcaseWidget(QPulse& qp, GeometryView& g
   connect(m_Controls->ApplyTournyButton, SIGNAL(clicked()), this, SLOT(ApplyTourniquet()));
   connect(m_Controls->InfuseSalineButton, SIGNAL(clicked()), this, SLOT(InfuseSaline()));
   connect(m_Controls->InjectMorphineButton, SIGNAL(clicked()), this, SLOT(InjectMorphine()));
-  emit UIChanged();
 }
 
 MultiTraumaShowcaseWidget::~MultiTraumaShowcaseWidget()
@@ -85,7 +86,9 @@ void MultiTraumaShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
     throw CommonDataModelException("Unable to load state file");
   m_Controls->Pulse.GetLogBox().append("Combining the tension pneumothorax with the blood loss from the hemorrhage pushes and eventually exceeds the limits of the homeostatic control mechanisms.");
   // Fill out any data requsts that we want to have plotted
-  drMgr.CreatePhysiologyDataRequest("BloodVolume",VolumeUnit::L);
+  drMgr.CreatePhysiologyDataRequest("BloodVolume", VolumeUnit::L);
+  drMgr.CreateGasCompartmentDataRequest(pulse::PulmonaryCompartment::LeftLung, "Volume", VolumeUnit::mL);
+  drMgr.CreateGasCompartmentDataRequest(pulse::PulmonaryCompartment::RightLung, "Volume", VolumeUnit::mL);
   const SESubstance* Morphine = pulse.GetSubstanceManager().GetSubstance("Morphine");
   drMgr.CreateSubstanceDataRequest(*Morphine, "PlasmaConcentration", MassPerVolumeUnit::mg_Per_mL);
 }
@@ -93,7 +96,7 @@ void MultiTraumaShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
 void MultiTraumaShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
 {
   // This is where we pull data from pulse, and push any actions to it
-
+  m_Controls->Mutex.lock();
   if (m_Controls->ApplyPneumothorax)
   {
     m_Controls->ApplyPneumothorax = false;
@@ -157,34 +160,24 @@ void MultiTraumaShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
     MorphineBolus.SetAdminRoute(cdm::SubstanceBolusData_eAdministrationRoute_Intravenous);
     pulse.ProcessAction(MorphineBolus);
   }
-  
-  // We don't need to update the GUI
-  //emit PulseChanged(); // Call this if you need to update the UI with data from pulse
-}
-
-void MultiTraumaShowcaseWidget::UpdateUI()
-{
-  
-}
-
-void MultiTraumaShowcaseWidget::PulseUpdate()
-{
- 
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::ApplyHemorrhage()
 {
+  m_Controls->Mutex.lock();
   m_Controls->HemorrhageRate_mL_Per_min = m_Controls->FlowRateEdit->text().toDouble();
   m_Controls->ApplyHemorrhage = true;
   m_Controls->ApplyHemorrhageButton->setDisabled(true);
   m_Controls->FlowRateEdit->setDisabled(true);
   m_Controls->ApplyPressureButton->setEnabled(true);
   m_Controls->Pulse.GetLogBox().append("Appling hemorrhage");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::ApplyPneumothorax()
 {
+  m_Controls->Mutex.lock();
   m_Controls->PneumothoraxSide = m_Controls->PneumothoraxTypeCombo->currentIndex()==0?cdm::eSide::Left:cdm::eSide::Right;
   m_Controls->PneumothoraxSeverity = m_Controls->SeveritySlider->value();
   m_Controls->ApplyPneumothorax = true;
@@ -193,48 +186,53 @@ void MultiTraumaShowcaseWidget::ApplyPneumothorax()
   m_Controls->PneumothoraxTypeCombo->setDisabled(true);
   m_Controls->NeedleDecompressButton->setEnabled(true);
   m_Controls->Pulse.GetLogBox().append("Appling Pneumothorax");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::ApplyPressure()
 {
+  m_Controls->Mutex.lock();
   m_Controls->ApplyPressure = true;
   m_Controls->ApplyPressureButton->setDisabled(true);
   m_Controls->ApplyTournyButton->setEnabled(true);
   m_Controls->Pulse.GetLogBox().append("Appling pressure to the wound");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::ApplyNeedleDecompression()
 {
+  m_Controls->Mutex.lock();
   m_Controls->ApplyNeedleDecompression = true;
   m_Controls->NeedleDecompressButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Appling Needle Decompression");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::ApplyTourniquet()
 {
+  m_Controls->Mutex.lock();
   m_Controls->ApplyTourniquet = true;
   m_Controls->ApplyTournyButton->setEnabled(false);
   m_Controls->InfuseSalineButton->setEnabled(true);
   m_Controls->InjectMorphineButton->setEnabled(true);
   m_Controls->Pulse.GetLogBox().append("Appling Tourniquet");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::InfuseSaline()
 {
+  m_Controls->Mutex.lock();
   m_Controls->InfuseSaline = true;
   m_Controls->InfuseSalineButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Infusing saline");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void MultiTraumaShowcaseWidget::InjectMorphine()
 {
+  m_Controls->Mutex.lock();
   m_Controls->InjectMorphine = true;
   m_Controls->InjectMorphineButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Injecting a bolus of morphine");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }

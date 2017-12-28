@@ -3,7 +3,10 @@
 #include <QPointer>
 #include <QCoreApplication>
 
+#include "cdm/CommonDataModel.h"
 #include "PulsePhysiologyEngine.h"
+#include "cdm/scenario/SEDataRequestManager.h"
+#include "cdm/engine/SEEngineTracker.h"
 #include "cdm/system/equipment/electrocardiogram/SEElectroCardioGramWaveformInterpolator.h"
 #include "cdm/patient/SEPatient.h"
 #include "cdm/system/physiology/SECardiovascularSystem.h"
@@ -71,13 +74,16 @@ public:
   bool                              Paused=false;
   bool                              RunInRealtime=true;
   bool                              Advancing;
-  double                            AdvanceStep_s=0.1;
+  double                            AdvanceStep_s;
   std::vector<PulseListener*>       Listeners;
 };
 
 QPulse::QPulse(QThread& thread, QTextEdit& log) : QObject()
 {
   m_Controls = new Controls(thread,log);
+
+
+  connect(this, SIGNAL(RefreshUI()), SLOT(UpdateUI()));
 }
 
 QPulse::~QPulse()
@@ -145,6 +151,12 @@ bool QPulse::ToggleRealtime()
 {
   if (m_Controls->Thread.isRunning())
     m_Controls->RunInRealtime = !m_Controls->RunInRealtime;
+
+  //if (m_Controls->RunInRealtime)
+  //  m_Controls->AdvanceStep_s = m_Controls->Pulse->GetTimeStep(TimeUnit::s);
+  //else
+  //  m_Controls->AdvanceStep_s = 0.1;
+
   return m_Controls->RunInRealtime;
 }
 
@@ -182,6 +194,8 @@ void QPulse::AdvanceTime()
   TimingProfile timer;
   m_Controls->Running = true;
   m_Controls->Advancing = true;
+  m_Controls->AdvanceStep_s = m_Controls->Pulse->GetTimeStep(TimeUnit::s);
+  timer.Start("ui");
   while (m_Controls->Running)
   {
     if (m_Controls->Paused)
@@ -198,7 +212,21 @@ void QPulse::AdvanceTime()
       if (m_Controls->RunInRealtime && sleep_ms > 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));// Wait for real time to catch up
     }
+    if (timer.GetElapsedTime_s("ui") > 0.1)
+    {
+      emit RefreshUI();// Only update the UI every 0.1 seconds
+      timer.Start("ui");// Reset our timer
+    }
   }
   m_Controls->Advancing = false;
+}
+
+void QPulse::UpdateUI()
+{
+  if (m_Controls->Running)
+  {
+    for (PulseListener* l : m_Controls->Listeners)
+      l->PulseUpdateUI();
+  }
 }
 

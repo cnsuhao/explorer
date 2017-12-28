@@ -2,19 +2,19 @@
 See accompanying NOTICE file for details.*/
 #pragma once
 
-#include "cdm/CommonDataModel.h"
-#include "PulsePhysiologyEngine.h"
-#include "cdm/scenario/SEDataRequestManager.h"
-#include "cdm/engine/SEEngineTracker.h"
-
 #include <QObject>
 #include <QTextEdit>
+class PhysiologyEngine;
+class SEEngineTracker;
+class SEDataRequestManager;
 
 class PulseListener
 {
 public:
   // This is where we pull data from pulse, and push any actions to it
   virtual void ProcessPhysiology(PhysiologyEngine& pulse) = 0;
+  // This is where we take data that we pulleds from pulse and do anything to our UI based on it
+  virtual  void PulseUpdateUI() { }
 };
 
 class QPulse : public QObject
@@ -41,7 +41,11 @@ public:
   void AdvanceTime();
   double GetTimeStep_s();
 
-protected:
+
+signals:
+  void RefreshUI();
+protected slots :
+  void UpdateUI();
 
 private:
   class Controls;

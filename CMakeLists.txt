@@ -12,6 +12,8 @@ project(${project_name})
 
 set(${project_name}_CMAKE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+find_package(Qt5Core REQUIRED)
+
 find_package(ParaView REQUIRED)
 if (NOT PARAVIEW_BUILD_QT_GUI)
 	status(FATAL_ERROR "${project_name} requires ParaView to be built with Qt")
@@ -85,7 +87,9 @@ SET(${project_name}_SOURCE_FILES
   MainExplorerWindow.cxx
   MainExplorerWindow.h
   QPulse.cxx
-  QPulse.h
+  QPulse.h 
+  QPulsePlot.cxx
+  QPulsePlot.h
   GeometryView.cxx
   GeometryView.h
   vtkWaveformWidget.cxx

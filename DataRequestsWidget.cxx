@@ -2,11 +2,18 @@
 #include "ui_DataRequests.h"
 
 #include <QMutex>
+#include <QLayout>
 
+#include "QPulsePlot.h"
+
+#include "cdm/CommonDataModel.h"
+#include "PulsePhysiologyEngine.h"
+#include "cdm/engine/SEEngineTracker.h"
 #include "cdm/utils/FileUtils.h"
-
 #include "cdm/system/equipment/electrocardiogram/SEElectroCardioGramWaveformInterpolator.h"
-#include "cdm/properties/SEFunctionElectricPotentialVsTime.h"
+#include "cdm/properties/SEScalarTime.h"
+
+
 
 class DataRequestsWidget::Controls : public Ui::DataRequestsWidget
 {
@@ -14,7 +21,8 @@ public:
   Controls(QTextEdit& log) : LogBox(log) {}
   QTextEdit&                         LogBox;
   QMutex                             Mutex;
-  std::vector<std::string>           Graphs; // Instead of plots, just names for now
+  size_t                             CurrentPlot=-1;
+  std::vector<QPulsePlot*>           Plots;
   std::vector<double>                Values; // New value for the plot
 };
 
@@ -23,23 +31,36 @@ DataRequestsWidget::DataRequestsWidget(QTextEdit& log, QWidget *parent, Qt::Wind
   m_Controls = new Controls(log);
   m_Controls->setupUi(this);
 
-  connect(this, SIGNAL(UIChanged()), this, SLOT(UpdateUI()));
-  connect(this, SIGNAL(PulseChanged()), this, SLOT(PulseUpdate()));
+  connect(m_Controls->DataRequested, SIGNAL(currentIndexChanged(int)), SLOT(ChangePlot(int)));
 }
 
 DataRequestsWidget::~DataRequestsWidget()
 {
+  Reset();
   delete m_Controls;
 }
 
 void DataRequestsWidget::Reset()
 {
+  m_Controls->CurrentPlot = -1;
+  DELETE_VECTOR(m_Controls->Plots);
   m_Controls->DataRequested->clear();
+}
+
+void DataRequestsWidget::ChangePlot(int idx) 
+{
+  m_Controls->Mutex.lock();
+  if (m_Controls->CurrentPlot != -1)
+  {
+    m_Controls->Plots[m_Controls->CurrentPlot]->GetView().setVisible(false);
+    m_Controls->CurrentPlot = idx;
+  }
+  m_Controls->Mutex.unlock();
 }
 
 void DataRequestsWidget::BuildGraphs(PhysiologyEngine& pulse)
 {
-  m_Controls->DataRequested->clear();
+  Reset();
   std::stringstream ss;
   SEDataRequestManager& drMgr = pulse.GetEngineTracker()->GetDataRequestManager();
   std::string title;
@@ -96,43 +117,42 @@ void DataRequestsWidget::BuildGraphs(PhysiologyEngine& pulse)
       m_Controls->LogBox.append(ss.str().c_str());
       continue;
     }
-    m_Controls->Graphs.push_back(title);
-    m_Controls->Values.push_back(0);
+    QPulsePlot *p = new QPulsePlot(1000);
+    p->GetChart().setTitle(title.c_str());
+    m_Controls->DataGraphWidget->layout()->addWidget(&p->GetView());
+    m_Controls->Plots.push_back(p);
     m_Controls->DataRequested->addItem(QString(title.c_str()));
   }
   
+  m_Controls->CurrentPlot = 0;
+  m_Controls->DataRequested->setCurrentIndex(0); 
+  m_Controls->Plots[0]->GetView().setVisible(true);
 }
 
 void DataRequestsWidget::ProcessPhysiology(PhysiologyEngine& pulse)
 {
   // This is where we pull data from pulse, and push any actions to it
   size_t i = 0;
+  QPulsePlot* plot;
   pulse.GetEngineTracker()->PullData();
+  double  v;
+  m_Controls->Mutex.lock();
   for (SEDataRequest* dr : pulse.GetEngineTracker()->GetDataRequestManager().GetDataRequests())
   {
-   /* if(dr->HasUnit())
-      m_Controls->Values[i++] = pulse.GetEngineTracker()->GetScalar(*dr)->GetValue(*dr->GetUnit());
+    plot = m_Controls->Plots[i++];
+    if (dr->HasUnit())
+     v=pulse.GetEngineTracker()->GetScalar(*dr)->GetValue(*dr->GetUnit());
     else
-      m_Controls->Values[i++] = pulse.GetEngineTracker()->GetScalar(*dr)->GetValue();*/
+     v=pulse.GetEngineTracker()->GetScalar(*dr)->GetValue();
+    plot->Append(pulse.GetSimulationTime(TimeUnit::s),v);
   }
-  emit PulseChanged(); // Call this if you need to update the UI with data from pulse
+  m_Controls->Mutex.unlock();
 }
 
-void DataRequestsWidget::UpdateUI()
+void DataRequestsWidget::PulseUpdateUI()
 {
-
-}
-
-void DataRequestsWidget::PulseUpdate()
-{
-  // This is where we take the pulse data we pulled and push it to a UI widget
-  /*if (++m_Controls->Count == 50)
-  {
-    m_Controls->Count = 0;
-    m_Controls->Mutex.lock();
-    for (size_t i = 0; i < m_Controls->Graphs.size(); i++)
-      m_Controls->LogBox.append(QString("%1 : %2").arg(m_Controls->Graphs[i].c_str()).arg(m_Controls->Values[i]));
-    m_Controls->Mutex.unlock();
-  }*/
+  m_Controls->Mutex.lock();
+  m_Controls->Plots[m_Controls->CurrentPlot]->UpdateUI();
+  m_Controls->Mutex.unlock();
 }
 

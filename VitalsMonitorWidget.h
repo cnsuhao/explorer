@@ -20,12 +20,10 @@ public:
   void Reset();
   void ProcessPhysiology(PhysiologyEngine& pulse);
 
-signals:
-  void UIChanged();
-  void PulseChanged();
-protected slots:
-  void UpdateUI();
-  void PulseUpdate();
+  void PulseUpdateUI();
+
+//signals:
+//protected slots:
 
 private:
   class Controls;

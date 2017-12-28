@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <QString>
 #include <QStringList>
+#include <QMutex>
 
 #include <pqLoadDataReaction.h>
 #include <pqPipelineSource.h>
@@ -20,12 +21,31 @@
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMPVRepresentationProxy.h>
 
+#include "cdm/CommonDataModel.h"
+#include "PulsePhysiologyEngine.h"
+#include "cdm/system/physiology/SEBloodChemistrySystem.h"
+
+class GeometryView::Data
+{
+public:
+  double SpO2;
+  bool   RenderSpO2;
+  QMutex Mutex;
+};
+
 GeometryView::GeometryView(pqRenderView* view, QObject* parentObject) : m_View(view)
 {
+  m_Data = new GeometryView::Data();
 }
 
 GeometryView::~GeometryView()
 {
+  delete m_Data;
+}
+
+void GeometryView::Reset()
+{
+  m_Data->RenderSpO2 = false;
 }
 
 pqPipelineSource* loadDataFile(const QString & filePath)
@@ -101,38 +121,60 @@ void GeometryView::LoadGeometry()
   renderProxy->UpdateVTKObjects();
 }
 
-void GeometryView::RenderSPO2(double spO2)
+void GeometryView::ProcessPhysiology(PhysiologyEngine& pulse)
 {
-  QColor color;
-  if (spO2 >= 0.95)
-    color = QColor(255, 115, 170);
-  else if (spO2 <= 0.90)
-    color = QColor(Qt::blue);
-  else
+  m_Data->Mutex.lock();
+  if (m_Data->RenderSpO2)
   {
-    QColor color1(255, 115, 170);
-    QColor color2(Qt::blue);
-
-    double t = (0.95 - spO2) / 0.05; // fraction of distance from 0.95 to 0.90
-
-    std::cout << "Using t=" << t << std::endl;
-    double r = floor((1 - t)*color1.red() + t * color2.red());
-    double g = floor((1 - t)*color1.green() + t * color2.green());
-    double b = floor((1 - t)*color1.blue() + t * color2.blue());
-
-    color = QColor(r, g, b);
+    m_Data->SpO2 = pulse.GetBloodChemistrySystem()->GetOxygenSaturation();
   }
+  m_Data->Mutex.unlock();
+}
 
-  vtkSMProxy* proxy = m_DataRepresentations[0]->getProxy();
-  vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
+void GeometryView::RenderSpO2(bool b)
+{
+  m_Data->Mutex.lock();
+  m_Data->RenderSpO2 = b;
+  m_Data->Mutex.unlock();
+}
 
-  QList<QVariant> rgb = pqSMAdaptor::getMultipleElementProperty(diffuse);
-  rgb.clear();
-  rgb.append(color.redF());
-  rgb.append(color.greenF());
-  rgb.append(color.blueF());
+void GeometryView::PulseUpdateUI()
+{
+  m_Data->Mutex.lock();
+  if (m_Data->RenderSpO2)
+  {
+    QColor color;
+    if (m_Data->SpO2 >= 0.95)
+      color = QColor(255, 115, 170);
+    else if (m_Data->SpO2 <= 0.90)
+      color = QColor(Qt::blue);
+    else
+    {
+      QColor color1(255, 115, 170);
+      QColor color2(Qt::blue);
 
-  pqSMAdaptor::setMultipleElementProperty(diffuse, rgb);
-  proxy->UpdateVTKObjects();
+      double t = (0.95 - m_Data->SpO2) / 0.05; // fraction of distance from 0.95 to 0.90
+
+      std::cout << "Using t=" << t << std::endl;
+      double r = floor((1 - t)*color1.red() + t * color2.red());
+      double g = floor((1 - t)*color1.green() + t * color2.green());
+      double b = floor((1 - t)*color1.blue() + t * color2.blue());
+
+      color = QColor(r, g, b);
+    }
+
+    vtkSMProxy* proxy = m_DataRepresentations[0]->getProxy();
+    vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
+
+    QList<QVariant> rgb = pqSMAdaptor::getMultipleElementProperty(diffuse);
+    rgb.clear();
+    rgb.append(color.redF());
+    rgb.append(color.greenF());
+    rgb.append(color.blueF());
+
+    pqSMAdaptor::setMultipleElementProperty(diffuse, rgb);
+    proxy->UpdateVTKObjects();
+  }
+  m_Data->Mutex.unlock();
 }
 

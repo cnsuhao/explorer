@@ -21,12 +21,10 @@ public:
 
   void ProcessPhysiology(PhysiologyEngine& pulse);
 
+  void PulseUpdateUI();
+
 signals:
-  void UIChanged();
-  void PulseChanged();
 protected slots:
-  void UpdateUI();
-  void PulseUpdate();
   void PlayPause();
   void RunInRealtime();
   void ResetExplorer();

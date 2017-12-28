@@ -3,6 +3,9 @@
 
 #include <QMutex>
 
+#include "cdm/CommonDataModel.h"
+#include "PulsePhysiologyEngine.h"
+#include "cdm/scenario/SEDataRequestManager.h"
 #include "cdm/properties/SEScalarTime.h"
 #include "cdm/properties/SEScalar0To1.h"
 #include "cdm/properties/SEScalarVolume.h"
@@ -16,9 +19,8 @@
 class AnaphylaxisShowcaseWidget::Controls : public Ui::AnaphylaxisShowcaseWidget
 {
 public:
-  Controls(QPulse& qp, GeometryView& g) : Pulse(qp), Geometry(g) {}
+  Controls(QPulse& qp) : Pulse(qp) {}
   QPulse&              Pulse;
-  GeometryView&        Geometry;
   bool                 ApplyAirwayObstruction=false;
   bool                 InjectEpinephrine=false;
   bool                 ReduceAirwayObstruction=false;
@@ -27,18 +29,13 @@ public:
   QMutex               Mutex;
 };
 
-AnaphylaxisShowcaseWidget::AnaphylaxisShowcaseWidget(QPulse& qp, GeometryView& g, QWidget *parent, Qt::WindowFlags flags) : QDockWidget(parent,flags)
+AnaphylaxisShowcaseWidget::AnaphylaxisShowcaseWidget(QPulse& qp, QWidget *parent, Qt::WindowFlags flags) : QDockWidget(parent,flags)
 {
-  m_Controls = new Controls(qp,g);
+  m_Controls = new Controls(qp);
   m_Controls->setupUi(this);
-
-  connect(this, SIGNAL(UIChanged()), this, SLOT(UpdateUI()));
-  connect(this, SIGNAL(PulseChanged()), this, SLOT(PulseUpdate()));
-  connect(this, SIGNAL(GeometryChanged()), parent, SLOT(UpdateUI()));
 
   connect(m_Controls->ObsButton, SIGNAL(clicked()), this, SLOT(ApplyAirwayObstruction()));
   connect(m_Controls->EpiButton, SIGNAL(clicked()), this, SLOT(InjectEpinephrine()));
-  emit UIChanged();
 }
 
 AnaphylaxisShowcaseWidget::~AnaphylaxisShowcaseWidget()
@@ -54,7 +51,8 @@ void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
   m_Controls->ApplyAirwayObstruction = false;
   m_Controls->InjectEpinephrine = false;
   m_Controls->ReduceAirwayObstruction = false;
-  if (!pulse.LoadStateFile("states/StandardMale@0s.pba"))
+
+  if (!pulse.LoadStateFile("./states/StandardMale@0s.pba"))
     throw CommonDataModelException("Unable to load state file");
   m_Controls->Pulse.GetLogBox().append("Anaphylaxis is a serious, potentially life threatening allergic reaction with facial and airway swelling.");
   m_Controls->Pulse.GetLogBox().append("It is an immune response that can occur quickly in response to exposure to an allergen.");
@@ -68,6 +66,7 @@ void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
 
 void AnaphylaxisShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
 {
+  m_Controls->Mutex.lock();
   // This is where we pull data from pulse, and push any actions to it
   if (m_Controls->ApplyAirwayObstruction)
   {
@@ -102,42 +101,25 @@ void AnaphylaxisShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
     AirwayObstuction.GetSeverity().SetValue(new_severity);
     pulse.ProcessAction(AirwayObstuction);
   }
-
-  // Grab the SpO2 so we can update the geometry
-  m_Controls->Mutex.lock();
-  m_Controls->SpO2 = pulse.GetBloodChemistrySystem()->GetOxygenSaturation();
   m_Controls->Mutex.unlock();
-
-  emit PulseChanged(); // Call this if you need to update the UI with data from pulse
-}
-
-void AnaphylaxisShowcaseWidget::UpdateUI()
-{
-  
-}
-
-void AnaphylaxisShowcaseWidget::PulseUpdate()
-{
-  m_Controls->Mutex.lock();
-  m_Controls->Geometry.RenderSPO2(m_Controls->SpO2);
-  m_Controls->Mutex.unlock();
-  emit GeometryChanged();
 }
 
 void AnaphylaxisShowcaseWidget::ApplyAirwayObstruction()
 {
+  m_Controls->Mutex.lock();
   m_Controls->ApplyAirwayObstruction = true;
   m_Controls->SeveritySlider->setEnabled(false);
   m_Controls->ObsButton->setEnabled(false);
   m_Controls->EpiButton->setEnabled(true);
   m_Controls->Pulse.GetLogBox().append("Applying anaphylaxis");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
 
 void AnaphylaxisShowcaseWidget::InjectEpinephrine()
 {
+  m_Controls->Mutex.lock();
   m_Controls->InjectEpinephrine = true;
   m_Controls->EpiButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Injecting a bolus of epinephrine");
-  emit UIChanged();
+  m_Controls->Mutex.unlock();
 }
