@@ -28,6 +28,7 @@ public:
   PhysiologyEngine& GetEngine();
   SEEngineTracker& GetEngineTracker();
 
+  void ScrollLogBox();
   QTextEdit& GetLogBox();
   void IgnoreAction(const std::string& name);
 

@@ -23,6 +23,7 @@ QPulsePlot::QPulsePlot(size_t max_points)
 {
   m_Data = new QPulsePlot::Data();
   m_Data->Series = new QtCharts::QLineSeries();
+  m_Data->Series->setUseOpenGL(true);
   m_Data->Chart = new QtCharts::QChart();
   m_Data->Chart->legend()->hide();
   m_Data->Chart->addSeries(m_Data->Series);

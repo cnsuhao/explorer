@@ -9,6 +9,7 @@
 #include "cdm/properties/SEScalarTime.h"
 #include "cdm/properties/SEScalar0To1.h"
 #include "cdm/properties/SEScalarVolume.h"
+#include "cdm/properties/SEScalarVolumePerTime.h"
 #include "cdm/properties/SEScalarMassPerVolume.h"
 #include "cdm/substance/SESubstance.h"
 #include "cdm/substance/SESubstanceManager.h"
@@ -21,11 +22,13 @@ class AnaphylaxisShowcaseWidget::Controls : public Ui::AnaphylaxisShowcaseWidget
 public:
   Controls(QPulse& qp) : Pulse(qp) {}
   QPulse&              Pulse;
+  const SESubstance*   Epinephrine;
   bool                 ApplyAirwayObstruction=false;
   bool                 InjectEpinephrine=false;
   bool                 ReduceAirwayObstruction=false;
+  bool                 CheckEC50=false;
   double               SpO2;
-  double               ReduceRatio = 0.1 / 60; // Amount to reduce obstruction size per second.
+  double               ReduceRatio = 0.1; // Amount to reduce obstruction size per time step.
   QMutex               Mutex;
 };
 
@@ -51,6 +54,7 @@ void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
   m_Controls->ApplyAirwayObstruction = false;
   m_Controls->InjectEpinephrine = false;
   m_Controls->ReduceAirwayObstruction = false;
+  m_Controls->CheckEC50 = false;
 
   if (!pulse.LoadStateFile("./states/StandardMale@0s.pba"))
     throw CommonDataModelException("Unable to load state file");
@@ -59,9 +63,16 @@ void AnaphylaxisShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
   m_Controls->Pulse.GetLogBox().append("The immune system releases chemicals into the body that cause the blood pressure to drop and the airways to narrow, blocking breathing.");
   m_Controls->Pulse.GetLogBox().append("Anaphylaxis is treated with an injection of epinephrine.");
   m_Controls->Pulse.GetLogBox().append("The anaphylaxis is rapidly reversed by the drug, allowing patient vital signs to return to normal.");
+  m_Controls->Pulse.GetLogBox().append("");
+  m_Controls->Pulse.GetLogBox().append("To introduce the anaphylaxis state, select a severity and click the 'Apply' Button.");
+  m_Controls->Pulse.ScrollLogBox();
+
+  m_Controls->Epinephrine = pulse.GetSubstanceManager().GetSubstance("Epinephrine");
+
   // Fill out any data requsts that we want to have plotted
-  const SESubstance* Epinephrine = pulse.GetSubstanceManager().GetSubstance("Epinephrine");
-  drMgr.CreateSubstanceDataRequest(*Epinephrine,"PlasmaConcentration",MassPerVolumeUnit::mg_Per_mL);
+  drMgr.CreatePhysiologyDataRequest("TidalVolume", VolumeUnit::mL);
+  drMgr.CreatePhysiologyDataRequest("CardiacOutput", VolumePerTimeUnit::L_Per_min);
+  drMgr.CreateSubstanceDataRequest(*m_Controls->Epinephrine,"PlasmaConcentration",MassPerVolumeUnit::mg_Per_mL);
 }
 
 void AnaphylaxisShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
@@ -80,13 +91,20 @@ void AnaphylaxisShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
   {
     m_Controls->InjectEpinephrine = false;
     m_Controls->ReduceAirwayObstruction = true;
-    const SESubstance* Epinephrine = pulse.GetSubstanceManager().GetSubstance("Epinephrine");
-    SESubstanceBolus   EpinephrineBolus(*Epinephrine);
+    SESubstanceBolus   EpinephrineBolus(*m_Controls->Epinephrine);
     EpinephrineBolus.GetConcentration().SetValue(1, MassPerVolumeUnit::g_Per_L);
     EpinephrineBolus.GetDose().SetValue(0.3, VolumeUnit::mL);
     EpinephrineBolus.SetAdminRoute(cdm::SubstanceBolusData_eAdministrationRoute_Intravenous);
     pulse.ProcessAction(EpinephrineBolus);
     m_Controls->Pulse.IgnoreAction("Airway Obstruction");
+  }
+  if (m_Controls->CheckEC50)
+  {
+    if (m_Controls->Epinephrine->GetPlasmaConcentration(MassPerVolumeUnit::mg_Per_mL) >= m_Controls->Epinephrine->GetPD()->GetEC50(MassPerVolumeUnit::mg_Per_mL))
+    {
+      m_Controls->CheckEC50 = false;
+      m_Controls->ReduceAirwayObstruction = true;
+    }
   }
   if (m_Controls->ReduceAirwayObstruction)
   {
@@ -112,6 +130,7 @@ void AnaphylaxisShowcaseWidget::ApplyAirwayObstruction()
   m_Controls->ObsButton->setEnabled(false);
   m_Controls->EpiButton->setEnabled(true);
   m_Controls->Pulse.GetLogBox().append("Applying anaphylaxis");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -121,5 +140,6 @@ void AnaphylaxisShowcaseWidget::InjectEpinephrine()
   m_Controls->InjectEpinephrine = true;
   m_Controls->EpiButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Injecting a bolus of epinephrine");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }

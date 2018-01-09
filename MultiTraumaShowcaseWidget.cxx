@@ -85,12 +85,15 @@ void MultiTraumaShowcaseWidget::ConfigurePulse(PhysiologyEngine& pulse, SEDataRe
   if(!pulse.LoadStateFile("states/Soldier@0s.pba"))
     throw CommonDataModelException("Unable to load state file");
   m_Controls->Pulse.GetLogBox().append("Combining the tension pneumothorax with the blood loss from the hemorrhage pushes and eventually exceeds the limits of the homeostatic control mechanisms.");
+  m_Controls->Pulse.ScrollLogBox();
   // Fill out any data requsts that we want to have plotted
   drMgr.CreatePhysiologyDataRequest("BloodVolume", VolumeUnit::L);
+  drMgr.CreatePhysiologyDataRequest("TidalVolume", VolumeUnit::mL);
+  drMgr.CreatePhysiologyDataRequest("CardiacOutput", VolumePerTimeUnit::L_Per_min);
   drMgr.CreateGasCompartmentDataRequest(pulse::PulmonaryCompartment::LeftLung, "Volume", VolumeUnit::mL);
   drMgr.CreateGasCompartmentDataRequest(pulse::PulmonaryCompartment::RightLung, "Volume", VolumeUnit::mL);
   const SESubstance* Morphine = pulse.GetSubstanceManager().GetSubstance("Morphine");
-  drMgr.CreateSubstanceDataRequest(*Morphine, "PlasmaConcentration", MassPerVolumeUnit::mg_Per_mL);
+  drMgr.CreateSubstanceDataRequest(*Morphine, "PlasmaConcentration", MassPerVolumeUnit::ug_Per_mL);
 }
 
 void MultiTraumaShowcaseWidget::ProcessPhysiology(PhysiologyEngine& pulse)
@@ -171,7 +174,8 @@ void MultiTraumaShowcaseWidget::ApplyHemorrhage()
   m_Controls->ApplyHemorrhageButton->setDisabled(true);
   m_Controls->FlowRateEdit->setDisabled(true);
   m_Controls->ApplyPressureButton->setEnabled(true);
-  m_Controls->Pulse.GetLogBox().append("Appling hemorrhage");
+  m_Controls->Pulse.GetLogBox().append("Applying hemorrhage");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -185,7 +189,8 @@ void MultiTraumaShowcaseWidget::ApplyPneumothorax()
   m_Controls->SeveritySlider->setDisabled(true);
   m_Controls->PneumothoraxTypeCombo->setDisabled(true);
   m_Controls->NeedleDecompressButton->setEnabled(true);
-  m_Controls->Pulse.GetLogBox().append("Appling Pneumothorax");
+  m_Controls->Pulse.GetLogBox().append("Applying Pneumothorax");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -195,7 +200,8 @@ void MultiTraumaShowcaseWidget::ApplyPressure()
   m_Controls->ApplyPressure = true;
   m_Controls->ApplyPressureButton->setDisabled(true);
   m_Controls->ApplyTournyButton->setEnabled(true);
-  m_Controls->Pulse.GetLogBox().append("Appling pressure to the wound");
+  m_Controls->Pulse.GetLogBox().append("Applying pressure to the wound");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -204,7 +210,8 @@ void MultiTraumaShowcaseWidget::ApplyNeedleDecompression()
   m_Controls->Mutex.lock();
   m_Controls->ApplyNeedleDecompression = true;
   m_Controls->NeedleDecompressButton->setEnabled(false);
-  m_Controls->Pulse.GetLogBox().append("Appling Needle Decompression");
+  m_Controls->Pulse.GetLogBox().append("Applying Needle Decompression");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -215,7 +222,8 @@ void MultiTraumaShowcaseWidget::ApplyTourniquet()
   m_Controls->ApplyTournyButton->setEnabled(false);
   m_Controls->InfuseSalineButton->setEnabled(true);
   m_Controls->InjectMorphineButton->setEnabled(true);
-  m_Controls->Pulse.GetLogBox().append("Appling Tourniquet");
+  m_Controls->Pulse.GetLogBox().append("Applying Tourniquet");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -225,6 +233,7 @@ void MultiTraumaShowcaseWidget::InfuseSaline()
   m_Controls->InfuseSaline = true;
   m_Controls->InfuseSalineButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Infusing saline");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }
 
@@ -234,5 +243,6 @@ void MultiTraumaShowcaseWidget::InjectMorphine()
   m_Controls->InjectMorphine = true;
   m_Controls->InjectMorphineButton->setEnabled(false);
   m_Controls->Pulse.GetLogBox().append("Injecting a bolus of morphine");
+  m_Controls->Pulse.ScrollLogBox();
   m_Controls->Mutex.unlock();
 }

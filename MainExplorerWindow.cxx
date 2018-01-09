@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
+#include <QScrollBar>
 #include <QTimer>
 #include <QThread>
 #include <QtCharts/QChart>

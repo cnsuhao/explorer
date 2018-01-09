@@ -2,6 +2,7 @@
 #include <QThread>
 #include <QPointer>
 #include <QCoreApplication>
+#include <QScrollBar>
 
 #include "cdm/CommonDataModel.h"
 #include "PulsePhysiologyEngine.h"
@@ -34,19 +35,27 @@ class LoggerForward2Qt : public LoggerForward
 public:
   LoggerForward2Qt(QTextEdit& log) : ExplorerLog(log) {}
   virtual ~LoggerForward2Qt() {}
-  virtual void ForwardDebug(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); }
-  virtual void ForwardInfo(const std::string& msg, const std::string& origin)    
+  virtual void ForwardDebug(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); ScrollLogBox(); }
+  virtual void ForwardInfo(const std::string& msg, const std::string& origin)
   { 
     for (std::string str : IgnoreActions)
     {
       if (msg.find(str) != str.npos)
         return;
     }
-    ExplorerLog.append(QString(msg.c_str())); 
+    ExplorerLog.append(QString(msg.c_str()));
+    ScrollLogBox();
   }
-  virtual void ForwardWarning(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); }
-  virtual void ForwardError(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); }
-  virtual void ForwardFatal(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); }
+  virtual void ForwardWarning(const std::string& msg, const std::string& origin) { ExplorerLog.append(QString(msg.c_str())); ScrollLogBox(); }
+  virtual void ForwardError(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); ScrollLogBox(); }
+  virtual void ForwardFatal(const std::string& msg, const std::string& origin)   { ExplorerLog.append(QString(msg.c_str())); ScrollLogBox(); }
+
+  void ScrollLogBox()
+  {
+    QScrollBar *sb = ExplorerLog.verticalScrollBar();
+    sb->setValue(sb->maximum());
+    ExplorerLog.update();
+  }
 
   QTextEdit& ExplorerLog;
   std::vector<std::string> IgnoreActions;
@@ -95,6 +104,10 @@ QPulse::~QPulse()
 QTextEdit& QPulse::GetLogBox()
 {
   return m_Controls->Log2Qt.ExplorerLog;
+}
+void QPulse::ScrollLogBox()
+{
+  m_Controls->Log2Qt.ScrollLogBox();
 }
 
 void QPulse::IgnoreAction(const std::string& name)
@@ -205,7 +218,9 @@ void QPulse::AdvanceTime()
     else
     {
       timer.Start("r");
-      m_Controls->Pulse->AdvanceModelTime(m_Controls->AdvanceStep_s, TimeUnit::s);
+      try {
+        m_Controls->Pulse->AdvanceModelTime(m_Controls->AdvanceStep_s, TimeUnit::s);
+      } catch(CommonDataModelException ex) { }
       for (PulseListener* l : m_Controls->Listeners)
         l->ProcessPhysiology(*m_Controls->Pulse);
       sleep_ms = (long long)((m_Controls->AdvanceStep_s - timer.GetElapsedTime_s("r"))*1000);
